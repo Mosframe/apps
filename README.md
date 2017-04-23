@@ -1,20 +1,27 @@
-#Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+#소개
+유저들의 고유한 아이콘을 캐릭터 활용한 MMO 슈팅 게임을 만들어 본다.
 
-#Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+#시작하기
+1.	설치방법
+- 노드 패키지 설치
+```js
+npm install --save typescript // 타입스크립트
+```
 
-#Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+2.	의존성 소프트웨어들
+3.	최종 릴리즈
+4.	API 레퍼런스
 
-#Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+#빌드와 테스트
+테스트 방법
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://www.visualstudio.com/en-us/docs/git/create-a-readme). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
+#기여방법
+개발에 도움을 주실분들은 ceo.mosframe@gmail.com으로 의견주세요.
+
+#개발 프로세스
+
+
+
+#참고자료들
+- [README Guidline](https://www.visualstudio.com/en-us/docs/git/create-a-readme)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
