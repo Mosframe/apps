@@ -11,7 +11,7 @@ client/assets/01-index.html
 ```
 - 결과
 
- ![결과](./images/01-index-01.png)
+ ![](./images/01-index-01.png)
 2. 캔버스에 텍스트 그리기
 client/assets/01-index.html
 ```html
@@ -23,4 +23,4 @@ client/assets/01-index.html
 ```
 - 결과
 
- ![결과](./images/01-index-02.png)
+ ![](./images/01-index-02.png)
