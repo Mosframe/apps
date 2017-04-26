@@ -1,0 +1,44 @@
+<meta charset="UTF-8">
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<script>
+    var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.font = '30px Arial';
+
+    var x       = 100;
+    var y       = 100;
+    var speedX  = 30;
+    var speedY  = 5;
+
+    // 변수화
+    var WIDTH   = 500;
+    var HEIGHT  = 500;
+    var message = '바운드됨';
+
+    setInterval( update, 40 );
+
+    function update() {
+        x += speedX;
+        y += speedY;
+        ctx.fillText('*', x, y);
+        console.log('x', x,'y',y);
+
+        if( x > WIDTH ) {
+            console.log( message );
+            speedX = -speedX;
+        }
+        if( x < 0 ) {
+            console.log( message );
+            speedX = -speedX;
+        }
+        if( y > HEIGHT ) {
+            console.log( message );
+            speedY = -speedY;
+        }
+        if( y < 0 ) {
+            console.log( message );
+            speedY = -speedY;
+        }
+    }
+
+</script>

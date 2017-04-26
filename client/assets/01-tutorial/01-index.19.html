@@ -1,0 +1,72 @@
+<meta charset="UTF-8">
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<script>
+    var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.font = '30px Arial';
+
+    // 변수화
+    var WIDTH    = 500;
+    var HEIGHT   = 500;
+    var message  = '바운드됨';
+
+    // player
+    var player = {
+        x       : 50,
+        y       : 40,
+        speedX  : 30,
+        speedY  : 5,
+        name    : 'P',
+    }
+
+    // enemy
+    var enemy1 = {
+        x       : 150,
+        y       : 350,
+        speedX  : 10,
+        speedY  : 15,
+        name    : 'E',
+        id      : 'E1',
+    };
+
+    var enemy2 = {
+        x       : 100,
+        y       : 350,
+        speedX  : 10,
+        speedY  :-15,
+        name    : 'E',
+        id      : 'E2',
+    };
+
+    var enemies = {};
+    enemies['E1'] = enemy1;
+    enemies['E2'] = enemy2;
+
+
+    setInterval( update, 40 );
+
+    // update entity
+    function updateEntity( something ) {
+        something.x += something.speedX;
+        something.y += something.speedY;
+        ctx.fillText(something.name, something.x, something.y);
+
+        if( something.x < 0 || something.x > WIDTH ) {
+            console.log( message );
+            something.speedX = -something.speedX;
+        }
+        if( something.y < 0 || something.y > HEIGHT ) {
+            console.log( message );
+            something.speedY = -something.speedY;
+        }
+    }
+
+    // update
+    function update() {
+        ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
+        updateEntity(enemies['E1']);
+        updateEntity(enemies['E2']);
+        updateEntity(player);
+    }
+
+</script>

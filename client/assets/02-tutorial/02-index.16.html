@@ -1,0 +1,231 @@
+<meta charset="UTF-8">
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<script>
+
+// DONE : 강화 아이템 추가
+
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial';
+
+// 변수화
+var WIDTH    = 500;
+var HEIGHT   = 500;
+var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
+
+
+var frameCount = 0;
+
+var score = 0;
+
+// player
+var player = {
+    x       : 50,
+    y       : 40,
+    speedX  : 30,
+    speedY  : 5,
+    name    : 'Player',
+    hp      : 10,
+    width   : 20,
+    height  : 40,
+    color   : 'green',
+}
+
+// enemy
+var enemies = {};
+
+// 강화 아이템들
+var upgrades = {};
+
+// 두 물체 사이의 거리값을 구한다.
+getDistanceBetweenEntity = function ( entity1, entity2 ) {
+    var vx = entity1.x - entity2.x;
+    var vy = entity1.y - entity2.y;
+    return Math.sqrt( vx*vx + vy*vy );
+}
+
+// 두 물체가 충돌했는지 알아낸다.
+testCollisionEntity = function ( entity1, entity2 ) {
+    var rect1 = {
+        x:entity1.x-entity1.width/2,
+        y:entity1.y-entity1.height/2,
+        width:entity1.width,
+        height:entity1.height,
+    }
+    var rect2 = {
+        x:entity2.x-entity2.width/2,
+        y:entity2.y-entity2.height/2,
+        width:entity2.width,
+        height:entity2.height,
+    }
+    return testCollisionRectRect( rect1, rect2 );
+}
+
+// 적군 생성 함수
+Enemy = function ( id, x, y, speedX, speedY, width, height ) {
+    var enemy = {
+        id      : id,
+        x       : x,
+        y       : y,
+        speedX  : speedX,
+        speedY  : speedY,
+        name    : 'Enemy',
+        width   : width,
+        height  : height,
+        color   : 'red',
+    };
+    enemies[id] = enemy;
+}
+
+// 무작위로 적군 생성
+randomlyGenerateEnemy = function() {
+    var id      = Math.random();
+    var x       = Math.random() * WIDTH;
+    var y       = Math.random() * HEIGHT;
+    var speedX  =  5 + Math.random() *  5; //  5 ~ 10
+    var speedY  =  5 + Math.random() *  5; //  5 ~ 10
+    var width   = 10 + Math.random() * 30; // 10 ~ 40
+    var height  = 10 + Math.random() * 30; // 10 ~ 40
+    Enemy( id, x, y, speedX, speedY, width, height );
+}
+
+// 강화 아이템 생성
+Upgrade = function ( id, x, y, speedX, speedY, width, height ) {
+    var upgrade = {
+        id      : id,
+        x       : x,
+        y       : y,
+        speedX  : speedX,
+        speedY  : speedY,
+        name    : 'Upgrade',
+        width   : width,
+        height  : height,
+        color   : 'orange',
+    };
+    upgrades[id] = upgrade;
+}
+
+// 무작위로 강화 아이템 생성
+randomlyGenerateUpgrade = function() {
+    var id      = Math.random();
+    var x       = Math.random() * WIDTH;
+    var y       = Math.random() * HEIGHT;
+    var speedX  =  0;
+    var speedY  =  0;
+    var width   = 10;
+    var height  = 10;
+    Upgrade( id, x, y, speedX, speedY, width, height );
+}
+
+// 마우스 이동 이벤트 처리
+document.onmousemove = function( mouse ) {
+    var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
+    var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
+
+    if( mouseX < player.width/2 )
+        mouseX = player.width/2;
+    if( mouseX > WIDTH-player.width/2 )
+        mouseX = WIDTH-player.width/2;
+    if( mouseY < player.height/2 )
+        mouseY = player.height/2;
+    if( mouseY > HEIGHT-player.height/2 )
+        mouseY = HEIGHT-player.height/2;
+
+    player.x = mouseX;
+    player.y = mouseY;
+}
+
+// 엔티티 갱신
+updateEntity = function ( something ) {
+    updateEntityPosition( something );
+    drawEntity( something );
+}
+
+// 엔티티 위치 갱신
+updateEntityPosition = function( something ) {
+    something.x += something.speedX;
+    something.y += something.speedY;
+
+    if( something.x < 0 || something.x > WIDTH ) {
+        something.speedX = -something.speedX;
+    }
+    if( something.y < 0 || something.y > HEIGHT ) {
+        something.speedY = -something.speedY;
+    }
+}
+
+// 박스와 박스 충돌 테스트
+testCollisionRectRect = function( rect1, rect2 ) {
+    return rect1.x <= rect2.x+rect2.width
+        && rect2.x <= rect1.x+rect1.width
+        && rect1.y <= rect2.y+rect2.height
+        && rect2.y <= rect1.y+rect1.height;
+}
+
+// 엔티티 그리기
+drawEntity = function( something ) {
+    ctx.save();
+    ctx.fillStyle = something.color;
+    ctx.fillRect(something.x-something.width/2, something.y-something.height/2, something.width, something.height );
+    ctx.restore();
+}
+
+// update
+update = function () {
+    ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
+
+    ++frameCount;
+    ++score;
+
+    // 적군 생성
+    if( frameCount % 100 === 0 ) // 4초 마다
+        randomlyGenerateEnemy();
+
+    // 강화 아이템 생성
+    if( frameCount % 75 === 0 )
+        randomlyGenerateUpgrade();
+
+    // 강화 아이템 갱신
+    for( var key in upgrades ) {
+        updateEntity(upgrades[key]);
+    }
+
+    // 적군 갱신
+    for( var key in enemies ) {
+        updateEntity(enemies[key]);
+
+        var isColliding = testCollisionEntity( player, enemies[key] );
+        if( isColliding ) {
+            console.log('colliding!');
+            player.hp = player.hp - 1;
+        }
+    }
+
+    if( player.hp <= 0 ) {
+        var timeSurvived = Date.now() - timeWhenGameStarted;
+        console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+        startNewGame();
+    }
+
+    drawEntity(player);
+    ctx.fillText(player.hp + " Hp", 0, 30 );
+    ctx.fillText("Score: " + score, 200, 30 );
+}
+
+startNewGame = function() {
+    player.hp           = 10;
+    frameCount          = 0;
+    score               = 0;
+    enemies             = {};
+    timeWhenGameStarted = Date.now();
+
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
+}
+
+
+startNewGame();
+setInterval( update, 40 );
+
+</script>

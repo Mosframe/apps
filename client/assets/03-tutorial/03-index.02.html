@@ -1,0 +1,397 @@
+<meta charset="UTF-8">
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<script>
+
+// DONE : Entity로 모든 객체를 상속관계로 정리함
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial';
+
+// 변수화
+var WIDTH    = 500;
+var HEIGHT   = 500;
+var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
+
+var frameCount = 0;
+
+var score = 0;
+var player;
+
+Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
+    var self = {
+        type            : type,
+        id              : id,
+        x               : x,
+        y               : y,
+        speedX          : speedX,
+        speedY          : speedY,
+        width           : width,
+        height          : height,
+        color           : color,
+    }
+    return self;
+}
+
+// 플레이어 생성
+createPlayer = function(){
+    var self = Entity('player','myId',50,40,30,5,20,20,'green');
+
+    self.hp              = 10   ;
+    self.attackSpeed     =  1   ; // 공격속도 (초당 발사량)
+    self.attackCounter   =  0   ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle        =  0   ; // 공격방향(각도)
+
+    self.pressingDown    = false;
+    self.pressingUp      = false;
+    self.pressingLeft    = false;
+    self.pressingRight   = false;
+
+    player = self;
+}
+
+// 적군들
+var enemies = {};
+// 강화 아이템들
+var upgrades = {};
+// 탄환들
+var bullets = {};
+
+// 두 물체 사이의 거리값을 구한다.
+getDistanceBetweenEntity = function ( entity1, entity2 ) {
+    var vx = entity1.x - entity2.x;
+    var vy = entity1.y - entity2.y;
+    return Math.sqrt( vx*vx + vy*vy );
+}
+
+// 두 물체가 충돌했는지 알아낸다.
+testCollisionEntity = function ( entity1, entity2 ) {
+    var rect1 = {
+        x:entity1.x-entity1.width/2,
+        y:entity1.y-entity1.height/2,
+        width:entity1.width,
+        height:entity1.height,
+    }
+    var rect2 = {
+        x:entity2.x-entity2.width/2,
+        y:entity2.y-entity2.height/2,
+        width:entity2.width,
+        height:entity2.height,
+    }
+    return testCollisionRectRect( rect1, rect2 );
+}
+
+// 적군 생성 함수
+Enemy = function ( id, x, y, speedX, speedY, width, height ) {
+    var self = Entity('enemy',id,x,y,speedX,speedY,width,height,'red');
+
+    self.hp              = 10;
+    self.attackSpeed     = 1; // 공격속도 (초당 발사량)
+    self.attackCounter   = 0; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle        = 0; // 공격방향(각도)
+
+    enemies[id] = self;
+}
+
+// 무작위로 적군 생성
+randomlyGenerateEnemy = function() {
+    var id      = Math.random();
+    var x       = Math.random() * WIDTH;
+    var y       = Math.random() * HEIGHT;
+    var speedX  =  5 + Math.random() *  5; //  5 ~ 10
+    var speedY  =  5 + Math.random() *  5; //  5 ~ 10
+    var width   = 10 + Math.random() * 30; // 10 ~ 40
+    var height  = 10 + Math.random() * 30; // 10 ~ 40
+    Enemy( id, x, y, speedX, speedY, width, height );
+}
+
+// 강화 아이템 생성 함수
+Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
+    var self = Entity('upgrade',id,x,y,speedX,speedY,width,height,color);
+
+    self.category = category;
+    upgrades[id] = self;
+}
+
+// 무작위로 강화 아이템 생성
+randomlyGenerateUpgrade = function() {
+    var id      = Math.random();
+    var x       = Math.random() * WIDTH;
+    var y       = Math.random() * HEIGHT;
+    var speedX  =  0;
+    var speedY  =  0;
+    var width   = 10;
+    var height  = 10;
+
+    if( Math.random()<0.5) {
+        var category    = 'score';
+        var color       = 'orange';
+    } else {
+        var category    = 'attackSpeed';
+        var color       = 'purple';
+    }
+
+    Upgrade( id, x, y, speedX, speedY, width, height, category, color );
+}
+
+// 탄환 생성 함수
+Bullet = function ( id, x, y, speedX, speedY, width, height ) {
+    var self = Entity('bullet',id,x,y,speedX,speedY,width,height,'black');
+
+    self.lifeTime = 100;
+    bullets[id] = self;
+}
+
+// 탄환 생성
+generateBullet = function( actor, overwriteAngle ) {
+    var id      = Math.random();
+    var x       = actor.x;
+    var y       = actor.y;
+    var angle   = actor.aimAngle;
+    if( overwriteAngle !== undefined ) {
+        angle = overwriteAngle;
+    }
+    var speedX  = Math.cos(angle/180*Math.PI)*5;
+    var speedY  = Math.sin(angle/180*Math.PI)*5;
+    var width   = 10;
+    var height  = 10;
+    Bullet( id, x, y, speedX, speedY, width, height );
+}
+
+// 엔티티 갱신
+updateEntity = function ( entity ) {
+    updateEntityPosition( entity );
+    drawEntity( entity );
+}
+
+// 엔티티 위치 갱신
+updateEntityPosition = function( entity ) {
+    if( entity.type === 'player' ) {
+        if( entity.pressingRight ) {
+            entity.x += 10;
+        }
+        if( entity.pressingLeft ) {
+            entity.x -= 10;
+        }
+        if( entity.pressingDown ) {
+            entity.y += 10;
+        }
+        if( entity.pressingUp ) {
+            entity.y -= 10;
+        }
+
+        // 이동제한
+        if( entity.x < entity.width/2 )
+            entity.x = entity.width/2;
+        if( entity.x > WIDTH-entity.width/2 )
+            entity.x = WIDTH-entity.width/2;
+        if( entity.y < entity.height/2 )
+            entity.y = entity.height/2;
+        if( entity.y > HEIGHT-entity.height/2 )
+            entity.y = HEIGHT-entity.height/2;
+
+    } else {
+        entity.x += entity.speedX;
+        entity.y += entity.speedY;
+
+        if( entity.x < 0 || entity.x > WIDTH ) {
+            entity.speedX = -entity.speedX;
+        }
+        if( entity.y < 0 || entity.y > HEIGHT ) {
+            entity.speedY = -entity.speedY;
+        }
+    }
+}
+
+// 박스와 박스 충돌 테스트
+testCollisionRectRect = function( rect1, rect2 ) {
+    return rect1.x <= rect2.x+rect2.width
+        && rect2.x <= rect1.x+rect1.width
+        && rect1.y <= rect2.y+rect2.height
+        && rect2.y <= rect1.y+rect1.height;
+}
+
+// 엔티티 그리기
+drawEntity = function( entity ) {
+    ctx.save();
+    ctx.fillStyle = entity.color;
+    ctx.fillRect(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height );
+    ctx.restore();
+}
+
+// 마우스 이동 이벤트 처리
+document.onmousemove = function( mouse ) {
+    var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
+    var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
+
+    mouseX -= player.x;
+    mouseY -= player.y;
+    player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
+}
+
+// 마우스 좌클릭
+document.onclick = function( mouse ) {
+    performAttack(player);
+}
+
+// 공격 수행
+performAttack = function(actor){
+    // 탄환 생성
+    if( player.attackCounter > 25 ) { // 매 1초마다
+        player.attackCounter = 0;
+        generateBullet(actor);
+    }
+}
+
+// 마우스 우클릭
+document.oncontextmenu = function( mouse ) {
+    performSpecialAttack(player);
+    mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
+}
+
+// 특수 공격 수행
+performSpecialAttack = function(actor){
+    // 탄환 생성
+    if( actor.attackCounter > 50 ) {
+
+        // 3연발 탄환 생성
+        generateBullet(actor, actor.aimAngle - 5);
+        generateBullet(actor, actor.aimAngle);
+        generateBullet(actor, actor.aimAngle + 5);
+        // 방사형 탄환 생성
+        //for( var angle=0; angle < 360; angle++ ){
+        //    generateBullet(actor, angle);
+        //}
+
+        actor.attackCounter = 0;
+    }
+}
+
+// 키보드 키 다운 이벤트
+document.onkeydown = function( event ) {
+    //console.log(evnet.keyCode);
+    // 자바스크립트 키코드 표 : http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+    if( event.keyCode === 68 ) {        // d
+        player.pressingRight = true;
+    } else if( event.keyCode === 83 ) { // s
+        player.pressingDown = true;
+    } else if( event.keyCode === 65 ) { // a
+        player.pressingLeft = true;
+    } else if( event.keyCode === 87 ) { // w
+        player.pressingUp = true;
+    }
+}
+
+// 키보드 키 업 이벤트
+document.onkeyup = function( event ) {
+    if( event.keyCode === 68 ) {        // d
+        player.pressingRight = false;
+    } else if( event.keyCode === 83 ) { // s
+        player.pressingDown = false;
+    } else if( event.keyCode === 65 ) { // a
+        player.pressingLeft = false;
+    } else if( event.keyCode === 87 ) { // w
+        player.pressingUp = false;
+    }
+}
+
+// update
+update = function () {
+    ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
+
+    ++frameCount;
+    ++score;
+
+    // 적군 생성
+    if( frameCount % 100 === 0 ) // 4초 마다 = 100/25fps
+        randomlyGenerateEnemy();
+
+    // 강화 아이템 생성
+    if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
+        randomlyGenerateUpgrade();
+
+    // 탄환 생성
+    player.attackCounter += player.attackSpeed; // 플레이어 공격속도에 따라서
+
+    // 탄환 갱신
+    for( var key in bullets ) {
+        updateEntity(bullets[key]);
+
+        var toRemove = false;
+
+        // 생명력 처리
+        bullets[key].lifeTime--;
+        if( bullets[key].lifeTime <= 0 ) {
+            toRemove = true;
+        }
+
+        // 적군과 충돌 처리
+        for( var key2 in enemies ) {
+            var isColliding = testCollisionEntity( bullets[key], enemies[key2] );
+            if( isColliding ) {
+                toRemove = true;
+                delete enemies[key2];
+                break;
+            }
+        }
+
+        if( toRemove ) {
+            delete bullets[key];
+        }
+    }
+
+    // 강화 아이템 갱신
+    for( var key in upgrades ) {
+        updateEntity(upgrades[key]);
+
+        var isColliding = testCollisionEntity( player, upgrades[key] );
+        if( isColliding ) {
+            if( upgrades[key].category === 'score' ) {
+                score += 1000;
+            }
+            if( upgrades[key].category === 'attackSpeed' ) {
+                player.attackSpeed += 3;
+            }
+            delete upgrades[key];
+        }
+    }
+
+    // 적군 갱신
+    for( var key in enemies ) {
+        updateEntity(enemies[key]);
+
+        var isColliding = testCollisionEntity( player, enemies[key] );
+        if( isColliding ) {
+            console.log('colliding!');
+            player.hp = player.hp - 1;
+        }
+    }
+
+    if( player.hp <= 0 ) {
+        var timeSurvived = Date.now() - timeWhenGameStarted;
+        console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+        startNewGame();
+    }
+    updateEntity(player);
+    ctx.fillText(player.hp + " Hp", 0, 30 );
+    ctx.fillText("Score: " + score, 200, 30 );
+}
+
+startNewGame = function() {
+    player.hp           = 10;
+    frameCount          = 0;
+    score               = 0;
+    enemies             = {};
+    upgrades            = {};
+    bullets             = {};
+    timeWhenGameStarted = Date.now();
+
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
+}
+
+createPlayer();
+startNewGame();
+setInterval( update, 40 ); // 1000/40=25fps
+
+</script>
