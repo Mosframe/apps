@@ -19,7 +19,7 @@ npm install --save typescript // 타입스크립트
 개발에 도움을 주실분들은 ceo.mosframe@gmail.com으로 의견주세요.
 
 #개발 프로세스
--[개발프로세스](./documents/development.md)
+- [개발프로세스](./documents/development.md)
 
 
 #참고자료들
