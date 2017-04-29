@@ -2,16 +2,16 @@
 - 참고 : http://rainingchain.com/tutorial/html5
 
 ## 캔버스에 게임의 기본 구성요소(Input,Update,Draw) 제작
-- [Cavas 이해하기](./processes/process.01.md)
-- [캔버스에 텍스트형 플레이어와 적군 그리기](../../client/assets/01-tutorial/01/index.03.html)
-- [캔버스안에서 플레이어, 적군 이동하기](../../client/assets/01-tutorial/01/index.04.html)
-- 박스형태의 플레이어, 적군 생성
-- 무작위 적군 생성하기
-- 마우스로 플레이어 컨트롤 하기
+ - [Cavas 이해하기](./processes/process.01.md)
+ - [캔버스에 텍스트형 플레이어와 적군 그리기](../../client/assets/01-tutorial/01/index.03.html)
+ - [캔버스안에서 플레이어, 적군 이동하기](../../client/assets/01-tutorial/01/index.04.html)
+ - 박스형태의 플레이어, 적군 생성
+ - 무작위 적군 생성하기
+ - 마우스로 플레이어 컨트롤 하기
 
 ## 서바이벌 슈팅 게임 만들기
-  - 무작위로 서로 다른 크기를 갖는 적군 생성.
-  - 4초마다 적군 추가 생성.
+- 무작위로 서로 다른 크기를 갖는 적군 생성.
+- 4초마다 적군 추가 생성.
 - 캔버스 안에서 사선으로 이동하는 적군
 - 플레이어 HP 구현
 - 적군과 충돌하면 HP 1씩 감소
