@@ -21,3 +21,9 @@ client
     index.html
 ```
 
+# NodeJS 설치
+- Node.js : https://nodejs.org/en/
+- 설치확인
+```node
+    $ npm init
+```
