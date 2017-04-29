@@ -3,10 +3,6 @@
 // -----------------------------------------------------------------------------
 
 var player;
-var enemies     = {};
-var upgrades    = {};
-var bullets     = {};
-
 
 // -----------------------------------------------------------------------------
 // 엔티티
@@ -73,20 +69,100 @@ Entity = function(type,id,x,y,width,height,image) {
 Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     var self = Entity( type, id, x, y, width, height, image );
 
-    self.hp              = hp           ;
-    self.attackSpeed     = attackSpeed  ; // 공격속도 (초당 발사량)
-    self.attackCounter   =  0           ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-    self.aimAngle        =  0           ; // 공격방향(각도)
+    self.hp                 = hp            ;
+    self.hpMax              = hp            ;
+    self.attackSpeed        = attackSpeed   ; // 공격속도 (초당 발사량)
+    self.attackCounter      = 0             ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle           = 0             ; // 공격방향(각도)
+    self.spriteAnimCounter  = 0             ; // 스프라이트 에니메이션 카운터
+
+    // 이동 4방향키가 눌려있는지..
+    self.pressingDown       = false;
+    self.pressingUp         = false;
+    self.pressingLeft       = false;
+    self.pressingRight      = false;
+
+    self.moveSpeedMax       = 3; // 최대 이동속도
 
     // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
         self.attackCounter += self.attackSpeed;
-
         if( self.hp <= 0 ) {
             self.onDeath();
         }
+    }
+    // 위치 갱신
+    self.updatePosition = function() {
+
+        var oldX = self.x;
+        var oldY = self.y;
+
+        // 이동
+        if( self.pressingRight ) {
+            self.x += self.moveSpeedMax;
+        }
+        if( self.pressingLeft ) {
+            self.x -= self.moveSpeedMax;
+        }
+        if( self.pressingDown ) {
+            self.y += self.moveSpeedMax;
+        }
+        if( self.pressingUp ) {
+            self.y -= self.moveSpeedMax;
+        }
+
+        // 이동제한
+        if( self.x < self.width/2 )
+            self.x = self.width/2;
+        if( self.x > Maps.current.width-self.width/2 )
+            self.x = Maps.current.width-self.width/2;
+        if( self.y < self.height/2 )
+            self.y = self.height/2;
+        if( self.y > Maps.current.height-self.height/2 )
+            self.y = Maps.current.height-self.height/2;
+
+        // 맵 오브젝트에 충돌처리
+        if( Maps.current.isPositionWall(self) ) {
+            self.x = oldX;
+            self.y = oldY;
+        }
+    }
+
+    // 그리기
+    self.draw = function() {
+        ctx.save();
+
+        // 플레이어와 떨어진 거리만큼 위치시킨다.
+        var x = self.x - player.x;
+        var y = self.y - player.y;
+        x += WIDTH/2;
+        y += HEIGHT/2;
+        x -= self.width/2;
+        y -= self.height/2;
+
+        // 공격방향의 음수값을 양수값으로 변환한다.
+        var aimAngle = self.aimAngle;
+        if( aimAngle < 0 ) aimAngle = 360 + aimAngle;
+
+        // 공격방향에 따른 스프라이트 번호 설정
+        var directionMod = 3; // right
+        if(aimAngle >= 45 && aimAngle < 135 ) // down
+            directionMod = 2;
+        else if(aimAngle >= 135 && aimAngle < 225 ) // left
+            directionMod = 1;
+        else if(aimAngle >= 225 && aimAngle < 315 ) // up
+            directionMod = 0;
+
+        // 이동 에니메이션 루핑 처리
+        var walkingMod = Math.floor(self.spriteAnimCounter) % 3;
+
+        // 스프라이트에서 정면 이미지 그리기
+        var frameWidth  = self.image.width/3;
+        var frameHeight = self.image.height/4;
+        ctx.drawImage(self.image,walkingMod*frameWidth,directionMod*frameHeight,frameWidth,frameHeight,x,y,width,height);
+        ctx.restore();
     }
     // 죽음
     self.onDeath = function() {}
@@ -95,7 +171,7 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         // 탄환 생성
         if( self.attackCounter > 25 ) { // 매 1초마다
             self.attackCounter = 0;
-            generateBullet(self);
+            Bullet.generate(self);
         }
     }
     // 특수 공격 수행
@@ -104,12 +180,12 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         if( self.attackCounter > 50 ) {
 
             // 3연발 탄환 생성
-            generateBullet(self, self.aimAngle - 5);
-            generateBullet(self, self.aimAngle);
-            generateBullet(self, self.aimAngle + 5);
+            Bullet.generate(self, self.aimAngle - 5);
+            Bullet.generate(self, self.aimAngle);
+            Bullet.generate(self, self.aimAngle + 5);
             // 방사형 탄환 생성
             //for( var angle=0; angle < 360; angle++ ){
-            //    generateBullet(self, angle);
+            //    Bullet.generate(self, angle);
             //}
 
             self.attackCounter = 0;
@@ -122,42 +198,29 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
 // -----------------------------------------------------------------------------
 // 플레이어
 Player = function(){
-    var self = Actor( 'player','myId', 50, 40, 50, 70, images.player, 10, 1 );
+    var self = Actor( 'player','myId', 0, 0, 50*1.5, 70*1.5, images.player, 10, 1 );
 
-    self.pressingDown    = false;
-    self.pressingUp      = false;
-    self.pressingLeft    = false;
-    self.pressingRight   = false;
+    self.moveSpeedMax       = 10; // 최대 이동속도
+    // 마우스 버튼이 눌려있는지...
+    self.pressingMouseLeft  = false;
+    self.pressingMouseRight = false;
 
-    // 위치 갱신
-    self.updatePosition = function() {
-        if( self.pressingRight ) {
-            self.x += 10;
-        }
-        if( self.pressingLeft ) {
-            self.x -= 10;
-        }
-        if( self.pressingDown ) {
-            self.y += 10;
-        }
-        if( self.pressingUp ) {
-            self.y -= 10;
-        }
-
-        // 이동제한
-        if( self.x < self.width/2 )
-            self.x = self.width/2;
-        if( self.x > currentMap.width-self.width/2 )
-            self.x = currentMap.width-self.width/2;
-        if( self.y < self.height/2 )
-            self.y = self.height/2;
-        if( self.y > currentMap.height-self.height/2 )
-            self.y = currentMap.height-self.height/2;
-    }
     // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
+
+        // 이동 에니메이션
+        if( self.pressingRight || self.pressingLeft || self.pressingDown || self.pressingUp ) {
+            self.spriteAnimCounter  += 0.2;
+        }
+
+        if( self.pressingMouseLeft ) {
+            self.performAttack();
+        }
+        if( self.pressingMouseRight ) {
+            self.performSpecialAttack();
+        }
     }
     // 죽음
     self.onDeath = function() {
@@ -174,14 +237,34 @@ Player = function(){
 Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
     var self = Actor('enemy',id,x,y,width,height,image,hp,attackSpeed );
     self.toRemove   = false;
-    enemies[id]     = self;
+    Enemy.list[id]  = self;
 
     // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
+        self.spriteAnimCounter  += 0.2;
         self.performAttack();
+        self.updateKeyPress();
         self.updateAim();
+    }
+    // 렌더링
+    var super_draw = self.draw;
+    self.draw = function() {
+        super_draw();
+
+        // 생명력바 그리기
+        var x = self.x - player.x + WIDTH/2;
+        var y = self.y - player.y + HEIGHT/2 - self.height/2 - 20;
+        ctx.save();
+        ctx.fillStyle = 'red';
+        var width = 100*self.hp/self.hpMax;
+        if( width < 0 ) width = 0;
+        ctx.fillRect( x-50, y, width, 10 );
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect( x-50, y, 100, 10 );
+
+        ctx.restore();
     }
     // 총구 방향 갱신
     self.updateAim = function() {
@@ -192,62 +275,59 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         // Math.atan2(y,x) : (y/x)점의 각도를 라디안 단위로 계산하여 반환한다. : 반환범위 (atan -PI/2~PI/2, atan2는 -PI~PI)
         self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180;
     }
+    // 방향키 눌림 이벤트
+    self.updateKeyPress = function() {
+
+        var diffX = player.x - self.x;
+        var diffY = player.y - self.y;
+
+        self.pressingRight  = diffX > 3;
+        self.pressingLeft   = diffX <-3;
+        self.pressingDown   = diffY > 3;
+        self.pressingUp     = diffY <-3;
+    }
     // 죽음
     self.onDeath = function() {
         self.toRemove = true;
     }
-    // 위치 갱신
-    self.updatePosition = function() {
-
-        // 플레이어를 따라다닌다.
-        var diffX = player.x - self.x;
-        var diffY = player.y - self.y;
-
-        if( diffX > 0 ) {
-            self.x += 3;
-        } else {
-            self.x -= 3;
-        }
-
-        if( diffY > 0 ) {
-            self.y += 3;
-        } else {
-            self.y -= 3;
-        }
-    }
 }
+Enemy.list = {};
 // 적군 갱신
-updateEnemy = function() {
+Enemy.update = function() {
     // 생성
     if( frameCount % 100 === 0 ) // 4초 마다 = 100/25fps
-        randomlyGenerateEnemy();
+        Enemy.randomlyGenerate();
     // 갱신
-    for( var key in enemies ) {
-        enemies[key].update();
+    for( var key in Enemy.list ) {
+        Enemy.list[key].update();
     }
     // 죽음
-    for( var key in enemies ) {
-        if( enemies[key].toRemove ) {
-            delete enemies[key];
+    for( var key in Enemy.list ) {
+        if( Enemy.list[key].toRemove ) {
+            delete Enemy.list[key];
         }
     }
 }
 // 무작위로 적군 생성
-randomlyGenerateEnemy = function() {
+Enemy.randomlyGenerate = function() {
     var id      = Math.random();
-    var x       = Math.random() * currentMap.width;
-    var y       = Math.random() * currentMap.height;
-    var width   = 64;
-    var height  = 64;
-    Enemy( id, x, y, width, height, images.enemy, 10, 1 );
+    var x       = Math.random() * Maps.current.width;
+    var y       = Math.random() * Maps.current.height;
+    var width   = 64*1.5;
+    var height  = 64*1.5;
+    if( Math.random() < 0.5 ) {
+        Enemy( id, x, y, width, height, images.bat, 2, 1 );
+    } else {
+        Enemy( id, x, y, width, height, images.bee, 1, 3 );
+    }
 }
 
 // -----------------------------------------------------------------------------
 // 강화 아이템
 Upgrade = function ( id, x, y, width, height, category, image ) {
     var self = Entity('upgrade',id,x,y,width,height,image);
-    self.category = category;
-    upgrades[id] = self;
+    self.category   = category;
+    Upgrade.list[id]= self;
 
     var super_update = self.update;
     self.update = function() {
@@ -261,25 +341,26 @@ Upgrade = function ( id, x, y, width, height, category, image ) {
             if( self.category === 'attackSpeed' ) {
                 player.attackSpeed += 3;
             }
-            delete upgrades[self.id];
+            delete Upgrade.list[self.id];
         }
     }
 }
+Upgrade.list = {};
 // 강화 아이템 갱신
-updateUpgrade = function() {
+Upgrade.update = function() {
     // 생성
     if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
-        randomlyGenerateUpgrade();
+        Upgrade.randomlyGenerate();
     // 갱신
-    for( var key in upgrades ) {
-        upgrades[key].update();
+    for( var key in Upgrade.list ) {
+        Upgrade.list[key].update();
     }
 }
 // 무작위로 강화 아이템 생성
-randomlyGenerateUpgrade = function() {
+Upgrade.randomlyGenerate = function() {
     var id      = Math.random();
-    var x       = Math.random() * currentMap.width;
-    var y       = Math.random() * currentMap.height;
+    var x       = Math.random() * Maps.current.width;
+    var y       = Math.random() * Maps.current.height;
     var width   = 32;
     var height  = 32;
 
@@ -302,60 +383,65 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
     self.combatType = combatType;
     self.speedX     = speedX;
     self.speedY     = speedY;
-    bullets[id]     = self;
+    self.toRemove   = false;
+    Bullet.list[id] = self;
 
     var super_update = self.update;
     self.update = function() {
         super_update();
 
-        var toRemove = false;
-
         // 생명력 처리
         self.lifeTime--;
         if( self.lifeTime <= 0 ) {
-            toRemove = true;
+            self.toRemove = true;
         }
 
         // 적군과 충돌 처리
         if( self.combatType === 'player' ) {
-            for( var key2 in enemies ) {
-                if( self.testCollision( enemies[key2] ) ) {
-                   toRemove = true;
-                    enemies[key2].hp -= 1;
+            for( var key2 in Enemy.list ) {
+                if( self.testCollision( Enemy.list[key2] ) ) {
+                   self.toRemove = true;
+                    Enemy.list[key2].hp -= 1;
                 }
             }
+        // 플레이어와 충돌 처리
         } else if( self.combatType === 'enemy' ) {
             if( self.testCollision( player ) ) {
-                toRemove = true;
+                self.toRemove = true;
                 player.hp -= 1;
             }
         }
+        // 맵 오브젝트에 충돌
+        if( Maps.current.isPositionWall(self) ) {
+            self.toRemove = true;
+        }
 
-        if( toRemove ) {
-            delete bullets[self.id];
+        if( self.toRemove ) {
+            delete Bullet.list[self.id];
         }
     }
     self.updatePosition = function() {
         self.x += self.speedX;
         self.y += self.speedY;
 
-        if( self.x < 0 || self.x > currentMap.width ) {
+        if( self.x < 0 || self.x > Maps.current.width ) {
             self.speedX = -self.speedX;
         }
-        if( self.y < 0 || self.y > currentMap.height ) {
+        if( self.y < 0 || self.y > Maps.current.height ) {
             self.speedY = -self.speedY;
         }
     }
 }
+Bullet.list = {};
 // 탄환 갱신
-updateBullet = function() {
+Bullet.update = function() {
     // 갱신
-    for( var key in bullets ) {
-        bullets[key].update();
+    for( var key in Bullet.list ) {
+        Bullet.list[key].update();
     }
 }
 // 탄환 생성
-generateBullet = function( actor, overwriteAngle ) {
+Bullet.generate = function( actor, overwriteAngle ) {
     var id      = Math.random();
     var x       = actor.x;
     var y       = actor.y;

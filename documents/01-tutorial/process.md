@@ -77,7 +77,7 @@
 1. [총알 배경오브젝트와 충돌처리](../../client/assets/01-tutorial/07/index.01.html)
 2. [액터들 이동시 배경오브젝트와 충돌처리](../../client/assets/01-tutorial/07/index.02.html)
 3. [맵에디터로 제작된 데이터(json)을 활용하여 충돌영역 설정하기](../../client/assets/01-tutorial/07/index.03.html)
-
+4. [이동하는 액터들을 이동속도 변수로 이동로직을 최적화함](../../client/assets/01-tutorial/07/index.04.html)
 
 
 ## Nodejs 학습

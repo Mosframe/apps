@@ -286,7 +286,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
         }
 
         if( toRemove ) {
-            delete delete bullets[self.id];
+            delete bullets[self.id];
         }
     }
 

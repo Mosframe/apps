@@ -381,7 +381,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
         }
 
         if( toRemove ) {
-            delete delete Bullet.list[self.id];
+            delete Bullet.list[self.id];
         }
     }
     self.updatePosition = function() {
