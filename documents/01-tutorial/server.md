@@ -6,8 +6,8 @@
 ---
 
 ## 1. 서버 프레임워크 설계
-01. [Hello World](./server/server.01.md)
-02. [프로젝트 설정](../../server/01-tutorial/01/main.01.js)
+01. [콘솔창에 Hello world 출력](./server/server.01.md)
+02. [Http서비스로 Hello world 출력](./server/server.02.md)
 
 
 
