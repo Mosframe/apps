@@ -52,14 +52,6 @@ package.json 파일이 생성된다.
 ```node
     $ npm install
 ```
-- Express를  설치한다.
-```node
-    $ npm install --save express
-```
-- Socket.io를 설치한다.
-```node
-    $ npm install --save socket.io
-```
 
 # Hello world 출력
 - [app.js 파일을 생성하고 다음 내용을 코딩한다.](../../../server/01-tutorial/01/app.js)
