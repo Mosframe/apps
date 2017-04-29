@@ -1,4 +1,4 @@
-// DONE : Http 서비스를 이용해 Hello world 출력하기
+// DONE : Http 정적파일 서비스하기
 
 // express 생성
 var express = require('express');

@@ -1,4 +1,4 @@
-# 2000포트로 서비스하기
+# Http 정적파일 서비스하기
 
 ## 파일 통신 ( Express )
 클라이언트에서 서버에 파일을 요청하면 클라이언트에 파일을 전송해 주는 역활
@@ -36,4 +36,13 @@
 ```
     http://localhost:2000
 ```
+5. 정적 이미지 파일 요청하기
+```
+    /client/assets/images/bullet.png 파일을 넣는다.
+```
+6. 브라우저를 다음 URL에 접속한다.
+```
+    http://localhost:2000/client/images/player.png
+```
+
 
