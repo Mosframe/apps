@@ -39,13 +39,13 @@ images.upgrade2.src = "images/upgrade2.png";
 
 // -----------------------------------------------------------------------------
 // 맵
-Maps = function(id,imageSrc,width,height,grid) {
+Maps = function(id,imageSrc,grid) {
     var self = {
-        id:id,
-        image:new Image(),
-        width:width,
-        height:height,
-        grid:grid,
+        id      : id,
+        image   : new Image(),
+        width   : grid[0].length * TILE_SIZE,
+        height  : grid.length * TILE_SIZE,
+        grid    : grid,
     }
     self.image.src = imageSrc;
 
@@ -112,7 +112,7 @@ var mapGrid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
 
-Maps.current = Maps('field', 'images/map.png', 1280, 1280, mapGrid );
+Maps.current = Maps('field', 'images/map.png', mapGrid );
 
 
 

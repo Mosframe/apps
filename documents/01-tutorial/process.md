@@ -73,8 +73,9 @@
 - [액터 스프라이트 에니메이션 (이동) 구현](../../client/assets/01-tutorial/06/index.03.html)
 - [플레이어는 이동할때만 이동에니메이션 처리](../../client/assets/01-tutorial/06/index.04.html)
 
-## 맵 오브젝트 충돌 처리
-- [총알 배경오브젝트와 충돌처리](../../client/assets/01-tutorial/07/index.01.html)
+## 7. 맵 오브젝트 충돌 처리
+1. [총알 배경오브젝트와 충돌처리](../../client/assets/01-tutorial/07/index.01.html)
+2. [액터들 이동시 배경오브젝트와 충돌처리](../../client/assets/01-tutorial/07/index.02.html)
 
 
 
