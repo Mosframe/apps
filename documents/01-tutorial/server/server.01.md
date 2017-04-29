@@ -30,6 +30,7 @@ client
     $ npm -v
     4.1.2
 ```
+# 프로젝트 설정
 - 프로젝트 초기화
 ```node
     $ npm init
@@ -58,7 +59,13 @@ client
 ```node
     $ npm install --save socket.io
 ```
-- app.js 파일을 생성한다.
+# Hello world 출력
+- app.js 파일을 생성하고 다음 내용을 코딩한다.
 ```js
    console.log('Hello world');
+```
+- 콘솔창에서 실행하기
+```js
+   $ node app.js
+   Hello world
 ```

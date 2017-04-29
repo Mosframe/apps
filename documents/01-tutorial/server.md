@@ -6,7 +6,7 @@
 ---
 
 ## 1. 서버 프레임워크 설계
-01. [프로젝트 구성](./server/server.01.md)
+01. [Hello World](./server/server.01.md)
 02. [프로젝트 설정](../../server/01-tutorial/01/main.01.js)
 
 
