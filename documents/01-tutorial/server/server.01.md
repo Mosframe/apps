@@ -30,6 +30,7 @@ client
     $ npm -v
     4.1.2
 ```
+
 # 프로젝트 설정
 - 프로젝트 초기화
 ```node
@@ -46,7 +47,7 @@ client
     ....
     Is this ok? (yes)
 ```
-- package.json 파일이 생성된다.
+package.json 파일이 생성된다.
 - 기본 패키지를 설치한다.
 ```node
     $ npm install
@@ -59,6 +60,7 @@ client
 ```node
     $ npm install --save socket.io
 ```
+
 # Hello world 출력
 - app.js 파일을 생성하고 다음 내용을 코딩한다.
 ```js
