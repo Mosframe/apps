@@ -62,7 +62,7 @@ package.json 파일이 생성된다.
 ```
 
 # Hello world 출력
-- app.js 파일을 생성하고 다음 내용을 코딩한다.
+- [app.js 파일을 생성하고 다음 내용을 코딩한다.](../../../server/01-tutorial/01/app.01.js)
 ```js
    console.log('Hello world');
 ```
