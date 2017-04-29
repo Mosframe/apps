@@ -58,3 +58,7 @@ client
 ```node
     $ npm install --save socket.io
 ```
+- app.js 파일을 생성한다.
+```js
+   console.log('Hello world');
+```
