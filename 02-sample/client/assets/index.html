@@ -5,7 +5,7 @@
 <script>
 
 var ctx = document.getElementById("ctx").getContext("2d");
-ctx.font = '30px Arial';
+ctx.font = '20px Arial';
 
 // 서버에 접속한다.
 var socket = io();
@@ -16,6 +16,10 @@ socket.on('newPositions',function(data){
     ctx.fillStyle = 'green';
     for( var c=0; c<data.length; ++c ) {
         ctx.fillRect(data[c].x-10, data[c].y-10, 20, 20 );
+    }
+    ctx.fillStyle = 'yellow';
+    for( var c=0; c<data.length; ++c ) {
+        ctx.fillText(data[c].name,data[c].x-5,data[c].y+7);
     }
 });
 

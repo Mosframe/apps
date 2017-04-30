@@ -32,7 +32,13 @@ io.sockets.on('connection', function(socket){
     socket.id = Math.random();
     socket.x = 0;
     socket.y = 0;
+    socket.name = "" + Math.floor(10*Math.random());
     sockets[socket.id] = socket;
+
+    // 접속종료 처리
+    socket.on('disconnect',function(){
+        delete sockets[socket.id];
+    });
 });
 
 // 서버 틱 업데이트 : 25fps
@@ -47,7 +53,8 @@ setInterval( function(){
         socket.y++;
         pack.push({
             x:socket.x,
-            y:socket.y
+            y:socket.y,
+            name:socket.name,
         });
     }
 
