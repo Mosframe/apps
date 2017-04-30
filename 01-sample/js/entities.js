@@ -257,9 +257,10 @@ randomlyGenerateUpgrade = function() {
 
 // -----------------------------------------------------------------------------
 // 탄환
-Bullet = function ( id, x, y, speedX, speedY, width, height ) {
+Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
     var self = Entity('bullet',id,x,y,speedX,speedY,width,height,images.bullet);
     self.lifeTime = 100;
+    self.combatType = combatType;
 
     var super_update = self.update;
     self.update = function() {
@@ -274,15 +275,18 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
         }
 
         // 적군과 충돌 처리
-        for( var key2 in enemies ) {
-            /*
-            var isColliding = self.testCollision( enemies[key2] );
-            if( isColliding ) {
-                toRemove = true;
-                delete enemies[key2];
-                break;
+        if( self.combatType === 'player' ) {
+            for( var key2 in enemies ) {
+                if( self.testCollision( enemies[key2] ) ) {
+                   toRemove = true;
+                    delete enemies[key2];
+                }
             }
-            */
+        } else if( self.combatType === 'enemy' ) {
+            if( self.testCollision( player ) ) {
+                toRemove = true;
+                player.hp -= 1;
+            }
         }
 
         if( toRemove ) {
@@ -305,5 +309,5 @@ generateBullet = function( actor, overwriteAngle ) {
     var speedY  = Math.sin(angle/180*Math.PI)*5;
     var width   = 32;
     var height  = 32;
-    Bullet( id, x, y, speedX, speedY, width, height );
+    Bullet( id, x, y, speedX, speedY, width, height, actor.type );
 }
