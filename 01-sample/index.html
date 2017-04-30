@@ -1,4 +1,4 @@
-<!-- DONE : 게임일시정지 기능 추가(단축키:p) -->
+<!-- DONE : 적들도 HP를 갖도록 수정 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -138,30 +138,9 @@ update = function () {
     ++frameCount;
     ++score;
 
-    // 적군 생성
-    if( frameCount % 100 === 0 ) // 4초 마다 = 100/25fps
-        randomlyGenerateEnemy();
-
-    // 강화 아이템 생성
-    if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
-        randomlyGenerateUpgrade();
-
-    // 탄환 갱신
-    for( var key in bullets ) {
-        bullets[key].update();
-    }
-
-    // 강화 아이템 갱신
-    for( var key in upgrades ) {
-        upgrades[key].update();
-    }
-
-    // 적군 갱신
-    for( var key in enemies ) {
-        enemies[key].update();
-    }
-
-    // 플레이어 갱신
+    updateBullet();
+    updateUpgrade();
+    updateEnemy();
     player.update();
 
     ctx.fillText(player.hp + " Hp", 0, 30 );

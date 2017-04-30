@@ -83,8 +83,13 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     self.update = function() {
         super_update();
         self.attackCounter += self.attackSpeed;
-    }
 
+        if( self.hp <= 0 ) {
+            self.onDeath();
+        }
+    }
+    // 죽음
+    self.onDeath = function() {}
     // 공격 수행
     self.performAttack = function() {
         // 탄환 생성
@@ -153,12 +158,12 @@ Player = function(){
     var super_update = self.update;
     self.update = function() {
         super_update();
-
-        if( self.hp <= 0 ) {
-            var timeSurvived = Date.now() - timeWhenGameStarted;
-            console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
-            startNewGame();
-        }
+    }
+    // 죽음
+    self.onDeath = function() {
+        var timeSurvived = Date.now() - timeWhenGameStarted;
+        console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+        startNewGame();
     }
 
     return self;
@@ -166,8 +171,10 @@ Player = function(){
 
 // -----------------------------------------------------------------------------
 // 적군
-Enemy = function ( id, x, y, width, height ) {
-    var self = Actor('enemy',id,x,y,width,height,images.enemy, 10, 1 );
+Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
+    var self = Actor('enemy',id,x,y,width,height,image,hp,attackSpeed );
+    self.toRemove   = false;
+    enemies[id]     = self;
 
     // 갱신
     var super_update = self.update;
@@ -176,7 +183,6 @@ Enemy = function ( id, x, y, width, height ) {
         self.performAttack();
         self.updateAim();
     }
-
     // 총구 방향 갱신
     self.updateAim = function() {
 
@@ -186,7 +192,10 @@ Enemy = function ( id, x, y, width, height ) {
         // Math.atan2(y,x) : (y/x)점의 각도를 라디안 단위로 계산하여 반환한다. : 반환범위 (atan -PI/2~PI/2, atan2는 -PI~PI)
         self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180;
     }
-
+    // 죽음
+    self.onDeath = function() {
+        self.toRemove = true;
+    }
     // 위치 갱신
     self.updatePosition = function() {
 
@@ -206,8 +215,22 @@ Enemy = function ( id, x, y, width, height ) {
             self.y -= 3;
         }
     }
-
-    enemies[id] = self;
+}
+// 적군 갱신
+updateEnemy = function() {
+    // 생성
+    if( frameCount % 100 === 0 ) // 4초 마다 = 100/25fps
+        randomlyGenerateEnemy();
+    // 갱신
+    for( var key in enemies ) {
+        enemies[key].update();
+    }
+    // 죽음
+    for( var key in enemies ) {
+        if( enemies[key].toRemove ) {
+            delete enemies[key];
+        }
+    }
 }
 // 무작위로 적군 생성
 randomlyGenerateEnemy = function() {
@@ -216,13 +239,15 @@ randomlyGenerateEnemy = function() {
     var y       = Math.random() * currentMap.height;
     var width   = 64;
     var height  = 64;
-    Enemy( id, x, y, width, height );
+    Enemy( id, x, y, width, height, images.enemy, 10, 1 );
 }
 
 // -----------------------------------------------------------------------------
 // 강화 아이템
 Upgrade = function ( id, x, y, width, height, category, image ) {
     var self = Entity('upgrade',id,x,y,width,height,image);
+    self.category = category;
+    upgrades[id] = self;
 
     var super_update = self.update;
     self.update = function() {
@@ -239,9 +264,16 @@ Upgrade = function ( id, x, y, width, height, category, image ) {
             delete upgrades[self.id];
         }
     }
-
-    self.category = category;
-    upgrades[id] = self;
+}
+// 강화 아이템 갱신
+updateUpgrade = function() {
+    // 생성
+    if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
+        randomlyGenerateUpgrade();
+    // 갱신
+    for( var key in upgrades ) {
+        upgrades[key].update();
+    }
 }
 // 무작위로 강화 아이템 생성
 randomlyGenerateUpgrade = function() {
@@ -266,10 +298,11 @@ randomlyGenerateUpgrade = function() {
 // 탄환
 Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
     var self = Entity('bullet',id,x,y,width,height,images.bullet);
-    self.lifeTime = 100;
+    self.lifeTime   = 100;
     self.combatType = combatType;
-    self.speedX = speedX;
-    self.speedY = speedY;
+    self.speedX     = speedX;
+    self.speedY     = speedY;
+    bullets[id]     = self;
 
     var super_update = self.update;
     self.update = function() {
@@ -288,7 +321,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
             for( var key2 in enemies ) {
                 if( self.testCollision( enemies[key2] ) ) {
                    toRemove = true;
-                    delete enemies[key2];
+                    enemies[key2].hp -= 1;
                 }
             }
         } else if( self.combatType === 'enemy' ) {
@@ -313,8 +346,13 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
             self.speedY = -self.speedY;
         }
     }
-
-    bullets[id] = self;
+}
+// 탄환 갱신
+updateBullet = function() {
+    // 갱신
+    for( var key in bullets ) {
+        bullets[key].update();
+    }
 }
 // 탄환 생성
 generateBullet = function( actor, overwriteAngle ) {
