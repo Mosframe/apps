@@ -1,10 +1,8 @@
-<!-- 일정시간이 지날때마다 적들이 추가로 생성되도록 한다.  -->
+<!-- 플레이어가 죽으면 게임이 재시작되도록 구현한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
-
-// DONE : 일정시간 후에 적군 추가 생성
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -130,11 +128,7 @@ update = function () {
     ++frameCount;
 
     // 적군 생성
-    if( frameCount === 100 ) // 4초 후에
-        randomlyGenerateEnemy();
-    if( frameCount === 200 ) // 8초 후에
-        randomlyGenerateEnemy();
-    if( frameCount === 300 ) // 12초 후에
+    if( frameCount % 100 === 0 ) // 4초 마다
         randomlyGenerateEnemy();
 
     // 적군 갱신
@@ -145,18 +139,27 @@ update = function () {
         if( isColliding ) {
             console.log('colliding!');
             player.hp = player.hp - 1;
-            if( player.hp <= 0 ) {
-                var timeSurvived = Date.now() - timeWhenGameStarted;
-                console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
-
-                timeWhenGameStarted = Date.now();
-                player.hp = 10;
-            }
         }
+    }
+
+    if( player.hp <= 0 ) {
+        var timeSurvived = Date.now() - timeWhenGameStarted;
+        console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+        startNewGame();
     }
 
     drawEntity(player);
     ctx.fillText(player.hp + " Hp", 0, 30 );
+}
+
+startNewGame = function() {
+    timeWhenGameStarted = Date.now();
+    player.hp = 10;
+    frameCount = 0;
+    enemies = {};
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
+    randomlyGenerateEnemy();
 }
 
 // 무작위로 적군 생성
@@ -171,10 +174,7 @@ randomlyGenerateEnemy = function() {
     Enemy( id, x, y, speedX, speedY, width, height );
 }
 
-randomlyGenerateEnemy();
-randomlyGenerateEnemy();
-randomlyGenerateEnemy();
-
+startNewGame();
 setInterval( update, 40 );
 
 </script>
