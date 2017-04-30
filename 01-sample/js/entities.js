@@ -96,21 +96,24 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     // 위치 갱신
     self.updatePosition = function() {
 
-        var oldX = self.x;
-        var oldY = self.y;
+        // 액터의 4방향 범퍼에 벽에 붙이치면 해당 방향으로 이동불가
+        var leftBumper  = {x:self.x-40  , y:self.y      };
+        var rightBumper = {x:self.x+40  , y:self.y      };
+        var upBumper    = {x:self.x     , y:self.y-16   };
+        var downBumper  = {x:self.x     , y:self.y+64   };
 
         // 이동
-        if( self.pressingRight ) {
-            self.x += self.moveSpeedMax;
-        }
-        if( self.pressingLeft ) {
+        if( self.pressingLeft   && !Maps.current.isPositionWall( leftBumper ) ) {
             self.x -= self.moveSpeedMax;
         }
-        if( self.pressingDown ) {
-            self.y += self.moveSpeedMax;
+        if( self.pressingRight  && !Maps.current.isPositionWall( rightBumper) ) {
+            self.x += self.moveSpeedMax;
         }
-        if( self.pressingUp ) {
+        if( self.pressingUp     && !Maps.current.isPositionWall( upBumper   ) ) {
             self.y -= self.moveSpeedMax;
+        }
+        if( self.pressingDown   && !Maps.current.isPositionWall( downBumper ) ) {
+            self.y += self.moveSpeedMax;
         }
 
         // 이동제한
@@ -122,12 +125,6 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
             self.y = self.height/2;
         if( self.y > Maps.current.height-self.height/2 )
             self.y = Maps.current.height-self.height/2;
-
-        // 맵 오브젝트에 충돌처리
-        if( Maps.current.isPositionWall(self) ) {
-            self.x = oldX;
-            self.y = oldY;
-        }
     }
 
     // 그리기
