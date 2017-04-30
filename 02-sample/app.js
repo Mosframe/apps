@@ -22,22 +22,33 @@ server.listen(2000);
 console.log('server started');
 
 var sockets = {};
+var players = {};
+
+// 플레이어 클래스
+var Player = function(id) {
+    var self = {
+        x:250,
+        y:250,
+        id:id,
+        name : "" + Math.floor(10*Math.random()),
+    }
+    return self;
+}
 
 // Socket.io를 통해 WebSocket 서비스를 시작한다.
 var io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log('socket connection');
-
-    // 소켓객체에 속성을 추가하고 소켓 리스테에 등록한다.
-    socket.id = Math.random();
-    socket.x = 0;
-    socket.y = 0;
-    socket.name = "" + Math.floor(10*Math.random());
+    // 소켓을 소켓DB에 등록한다.
     sockets[socket.id] = socket;
+    // 플레이어 생성 > 등록
+    var player = Player(socket.id);
+    players[socket.id] = player;
 
     // 접속종료 처리
     socket.on('disconnect',function(){
         delete sockets[socket.id];
+        delete players[socket.id];
     });
 });
 
@@ -46,19 +57,19 @@ setInterval( function(){
 
     var pack = [];
 
-    // 모든 클라이언트들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
-    for( var socketId in sockets ) {
-        var socket = sockets[socketId];
-        socket.x++;
-        socket.y++;
+    // 모든 플레이어들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
+    for( var playerId in players ) {
+        var player = players[playerId];
+        player.x++;
+        player.y++;
         pack.push({
-            x:socket.x,
-            y:socket.y,
-            name:socket.name,
+            x:player.x,
+            y:player.y,
+            name:player.name,
         });
     }
 
-    // 모든 클라이언트들에에 패키지 데이터를 보낸다.
+    // 모든 클라이언트들에게 패키지 데이터를 보낸다.
     for( var socketId in sockets ) {
         var socket = sockets[socketId];
         socket.emit( 'newPositions', pack );
