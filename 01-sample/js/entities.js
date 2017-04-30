@@ -69,10 +69,11 @@ Entity = function(type,id,x,y,width,height,image) {
 Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     var self = Entity( type, id, x, y, width, height, image );
 
-    self.hp              = hp           ;
-    self.attackSpeed     = attackSpeed  ; // 공격속도 (초당 발사량)
-    self.attackCounter   =  0           ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-    self.aimAngle        =  0           ; // 공격방향(각도)
+    self.hp             = hp            ;
+    self.hpMax          = hp            ;
+    self.attackSpeed    = attackSpeed   ; // 공격속도 (초당 발사량)
+    self.attackCounter  =  0            ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle       =  0            ; // 공격방향(각도)
 
     // 갱신
     var super_update = self.update;
@@ -190,6 +191,24 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         super_update();
         self.performAttack();
         self.updateAim();
+    }
+    // 렌더링
+    var super_draw = self.draw;
+    self.draw = function() {
+        super_draw();
+
+        // 생명력바 그리기
+        var x = self.x - player.x + WIDTH/2;
+        var y = self.y - player.y + HEIGHT/2 - self.height/2 - 20;
+        ctx.save();
+        ctx.fillStyle = 'red';
+        var width = 100*self.hp/self.hpMax;
+        if( width < 0 ) width = 0;
+        ctx.fillRect( x-50, y, width, 10 );
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect( x-50, y, 100, 10 );
+
+        ctx.restore();
     }
     // 총구 방향 갱신
     self.updateAim = function() {
