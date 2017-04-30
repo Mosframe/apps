@@ -1,4 +1,4 @@
-<!-- 플레이어와 적들에 부피와 칼라 속성을 부여한다.  -->
+<!-- 적들의 외형을 다르게 설정해 본다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -52,7 +52,7 @@ testCollisionEntity = function ( entity1, entity2 ) {
     return testCollisionRectRect( rect1, rect2 );
 }
 
-Enemy = function ( id, x, y, speedX, speedY ) {
+Enemy = function ( id, x, y, speedX, speedY, width, height ) {
     var enemy = {
         id      : id,
         x       : x,
@@ -60,8 +60,8 @@ Enemy = function ( id, x, y, speedX, speedY ) {
         speedX  : speedX,
         speedY  : speedY,
         name    : 'E',
-        width   : 30,
-        height  : 30,
+        width   : width,
+        height  : height,
         color   : 'red',
     };
     enemies[id] = enemy;
@@ -78,7 +78,7 @@ document.onmousemove = function( mouse ) {
 // update entity
 updateEntity = function ( something ) {
     updateEntityPosition( something );
-    drawEnemy( something );
+    drawEntity( something );
 }
 
 updateEntityPosition = function( something ) {
@@ -101,14 +101,8 @@ testCollisionRectRect = function( rect1, rect2 ) {
         && rect2.y <= rect1.y+rect1.height;
 }
 
-drawPlayer = function( something ) {
-    ctx.save();
-    ctx.fillStyle = something.color;
-    ctx.fillRect(something.x-something.width/2, something.y-something.height/2, something.width, something.height );
-    ctx.restore();
-}
-
-drawEnemy = function( something ) {
+// 엔티티 그리기
+drawEntity = function( something ) {
     ctx.save();
     ctx.fillStyle = something.color;
     ctx.fillRect(something.x-something.width/2, something.y-something.height/2, something.width, something.height );
@@ -136,14 +130,13 @@ update = function () {
         }
     }
 
-    drawPlayer(player);
+    drawEntity(player);
     ctx.fillText(player.hp + " Hp", 0, 30 );
 }
 
-
-Enemy('E1',150,350,10, 15);
-Enemy('E2',250,350,10,-15);
-Enemy('E3',250,150,10,-8);
+Enemy('E1',150,350,10, 15, 40, 40 );
+Enemy('E2',250,350,10,-15, 25, 40 );
+Enemy('E3',250,150,10,- 8, 40, 25 );
 
 setInterval( update, 40 );
 
