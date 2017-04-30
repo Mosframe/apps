@@ -1,4 +1,4 @@
-<!-- DONE : 이미지를 각각 객체 사이즈에 맞게 조정 -->
+<!-- DONE : 배경 이미지 그리기 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -20,17 +20,17 @@ var frameCount  = 0;
 var score       = 0;
 
 var images = {};
-images.player = new Image();
+images.player   = new Image();
 images.player.src   = "images/player.png";
-images.enemy = new Image();
+images.enemy    = new Image();
 images.enemy.src    = "images/enemy.png";
-images.bullet = new Image();
+images.bullet   = new Image();
 images.bullet.src   = "images/bullet.png";
 images.upgrade1 = new Image();
 images.upgrade1.src = "images/upgrade1.png";
 images.upgrade2 = new Image();
 images.upgrade2.src = "images/upgrade2.png";
-images.map = new Image();
+images.map      = new Image();
 images.map.src      = "images/map.png";
 
 // -----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ document.onkeyup = function( event ) {
 
 // update
 update = function () {
-    ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
+    drawMap();
 
     ++frameCount;
     ++score;
@@ -160,4 +160,10 @@ startNewGame();
 // 메인루프
 setInterval( update, 40 ); // 1000/40=25fps
 
+
+// -----------------------------------------------------------------------------
+// 맵
+drawMap = function() {
+    ctx.drawImage( images.map, 0, 0 );
+}
 </script>
