@@ -62,5 +62,6 @@
 050. Entity로 모든 객체를 상속관계로 정리함
 051. Entity update함수 정리
 052. Entity 멤버함수들 정리
+053. 충돌 체크함수도 Entity 멤버함수로 정리
 
 [index.html](../../01-sample/index.html)

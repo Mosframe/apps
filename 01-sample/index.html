@@ -1,22 +1,36 @@
-<!-- Entity 멤버함수들 정리 -->
+<!-- 충돌 체크함수도 Entity 멤버함수로 정리 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
 
+// -----------------------------------------------------------------------------
+
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
 
-// 변수화
-var WIDTH    = 500;
-var HEIGHT   = 500;
+var WIDTH       = 500;
+var HEIGHT      = 500;
+
+// -----------------------------------------------------------------------------
+
 var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
+var frameCount  = 0;
+var score       = 0;
 
-var frameCount = 0;
+// -----------------------------------------------------------------------------
 
-var score = 0;
-var player;
+// 박스와 박스 충돌 테스트
+testCollisionRectRect = function( rect1, rect2 ) {
+    return rect1.x <= rect2.x+rect2.width
+        && rect2.x <= rect1.x+rect1.width
+        && rect1.y <= rect2.y+rect2.height
+        && rect2.y <= rect1.y+rect1.height;
+}
 
+// -----------------------------------------------------------------------------
+
+// 엔티티
 Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
     var self = {
         type    : type,
@@ -79,10 +93,36 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
         ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
         ctx.restore();
     }
+    // 두 물체 사이의 거리값을 구한다.
+    self.getDistance = function ( entity2 ) {
+        var vx = self.x - entity2.x;
+        var vy = self.y - entity2.y;
+        return Math.sqrt( vx*vx + vy*vy );
+    }
+    // 두 물체가 충돌했는지 알아낸다.
+    self.testCollision = function ( entity2 ) {
+        var rect1 = {
+            x:self.x-self.width/2,
+            y:self.y-self.height/2,
+            width:self.width,
+            height:self.height,
+        }
+        var rect2 = {
+            x:entity2.x-entity2.width/2,
+            y:entity2.y-entity2.height/2,
+            width:entity2.width,
+            height:entity2.height,
+        }
+        return testCollisionRectRect( rect1, rect2 );
+    }
 
     return self;
 }
 
+// -----------------------------------------------------------------------------
+// 플레이어
+
+var player;
 
 // 플레이어 생성
 createPlayer = function(){
@@ -100,6 +140,8 @@ createPlayer = function(){
 
     player = self;
 }
+
+// -----------------------------------------------------------------------------
 
 // 적군들
 var enemies = {};
@@ -127,6 +169,8 @@ randomlyGenerateEnemy = function() {
     var height  = 10 + Math.random() * 30; // 10 ~ 40
     Enemy( id, x, y, speedX, speedY, width, height );
 }
+
+// -----------------------------------------------------------------------------
 
 // 강화 아이템들
 var upgrades = {};
@@ -160,6 +204,8 @@ randomlyGenerateUpgrade = function() {
     Upgrade( id, x, y, speedX, speedY, width, height, category, color );
 }
 
+// -----------------------------------------------------------------------------
+
 // 탄환들
 var bullets = {};
 
@@ -187,37 +233,7 @@ generateBullet = function( actor, overwriteAngle ) {
     Bullet( id, x, y, speedX, speedY, width, height );
 }
 
-// 두 물체 사이의 거리값을 구한다.
-getDistanceBetweenEntity = function ( entity1, entity2 ) {
-    var vx = entity1.x - entity2.x;
-    var vy = entity1.y - entity2.y;
-    return Math.sqrt( vx*vx + vy*vy );
-}
-
-// 두 물체가 충돌했는지 알아낸다.
-testCollisionEntity = function ( entity1, entity2 ) {
-    var rect1 = {
-        x:entity1.x-entity1.width/2,
-        y:entity1.y-entity1.height/2,
-        width:entity1.width,
-        height:entity1.height,
-    }
-    var rect2 = {
-        x:entity2.x-entity2.width/2,
-        y:entity2.y-entity2.height/2,
-        width:entity2.width,
-        height:entity2.height,
-    }
-    return testCollisionRectRect( rect1, rect2 );
-}
-
-// 박스와 박스 충돌 테스트
-testCollisionRectRect = function( rect1, rect2 ) {
-    return rect1.x <= rect2.x+rect2.width
-        && rect2.x <= rect1.x+rect1.width
-        && rect1.y <= rect2.y+rect2.height
-        && rect2.y <= rect1.y+rect1.height;
-}
+// -----------------------------------------------------------------------------
 
 // 마우스 이동 이벤트 처리
 document.onmousemove = function( mouse ) {
@@ -234,37 +250,10 @@ document.onclick = function( mouse ) {
     performAttack(player);
 }
 
-// 공격 수행
-performAttack = function(actor){
-    // 탄환 생성
-    if( player.attackCounter > 25 ) { // 매 1초마다
-        player.attackCounter = 0;
-        generateBullet(actor);
-    }
-}
-
 // 마우스 우클릭
 document.oncontextmenu = function( mouse ) {
     performSpecialAttack(player);
     mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
-}
-
-// 특수 공격 수행
-performSpecialAttack = function(actor){
-    // 탄환 생성
-    if( actor.attackCounter > 50 ) {
-
-        // 3연발 탄환 생성
-        generateBullet(actor, actor.aimAngle - 5);
-        generateBullet(actor, actor.aimAngle);
-        generateBullet(actor, actor.aimAngle + 5);
-        // 방사형 탄환 생성
-        //for( var angle=0; angle < 360; angle++ ){
-        //    generateBullet(actor, angle);
-        //}
-
-        actor.attackCounter = 0;
-    }
 }
 
 // 키보드 키 다운 이벤트
@@ -294,6 +283,8 @@ document.onkeyup = function( event ) {
         player.pressingUp = false;
     }
 }
+
+// -----------------------------------------------------------------------------
 
 // update
 update = function () {
@@ -327,7 +318,7 @@ update = function () {
 
         // 적군과 충돌 처리
         for( var key2 in enemies ) {
-            var isColliding = testCollisionEntity( bullets[key], enemies[key2] );
+            var isColliding = bullets[key].testCollision( enemies[key2] );
             if( isColliding ) {
                 toRemove = true;
                 delete enemies[key2];
@@ -343,8 +334,7 @@ update = function () {
     // 강화 아이템 갱신
     for( var key in upgrades ) {
         upgrades[key].update();
-
-        var isColliding = testCollisionEntity( player, upgrades[key] );
+        var isColliding = player.testCollision( upgrades[key] );
         if( isColliding ) {
             if( upgrades[key].category === 'score' ) {
                 score += 1000;
@@ -359,8 +349,7 @@ update = function () {
     // 적군 갱신
     for( var key in enemies ) {
         enemies[key].update();
-
-        var isColliding = testCollisionEntity( player, enemies[key] );
+        var isColliding = player.testCollision( enemies[key] );
         if( isColliding ) {
             console.log('colliding!');
             player.hp = player.hp - 1;
@@ -377,6 +366,36 @@ update = function () {
     ctx.fillText("Score: " + score, 200, 30 );
 }
 
+// -----------------------------------------------------------------------------
+
+// 공격 수행
+performAttack = function(actor){
+    // 탄환 생성
+    if( player.attackCounter > 25 ) { // 매 1초마다
+        player.attackCounter = 0;
+        generateBullet(actor);
+    }
+}
+
+// 특수 공격 수행
+performSpecialAttack = function(actor){
+    // 탄환 생성
+    if( actor.attackCounter > 50 ) {
+
+        // 3연발 탄환 생성
+        generateBullet(actor, actor.aimAngle - 5);
+        generateBullet(actor, actor.aimAngle);
+        generateBullet(actor, actor.aimAngle + 5);
+        // 방사형 탄환 생성
+        //for( var angle=0; angle < 360; angle++ ){
+        //    generateBullet(actor, angle);
+        //}
+
+        actor.attackCounter = 0;
+    }
+}
+
+// 새로운 게임 시작
 startNewGame = function() {
     player.hp           = 10;
     frameCount          = 0;
@@ -391,8 +410,13 @@ startNewGame = function() {
     randomlyGenerateEnemy();
 }
 
+// -----------------------------------------------------------------------------
+
+// 플레이어 생성
 createPlayer();
+// 게임 시작
 startNewGame();
+// 메인루프
 setInterval( update, 40 ); // 1000/40=25fps
 
 </script>
