@@ -1,4 +1,4 @@
-<!-- 적을 추가로 생성해 본다.  -->
+<!-- 매번 갱신할때 마다 화면을 지운다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -56,9 +56,9 @@ function updateEntity( something ) {
 
 // update
 function update() {
+    ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
     updateEntity(enemy1);
     updateEntity(enemy2);
     updateEntity(player);
 }
-
 </script>
