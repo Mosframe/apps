@@ -1,4 +1,4 @@
-<!-- 마우스 우클릭으로 3연발 발사  -->
+<!-- 우클릭으로 방사형 무기 발사  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -228,11 +228,16 @@ document.onclick = function( mouse ) {
 
 // 마우스 우클릭
 document.oncontextmenu = function( mouse ) {
+    // 탄환 생성
     if( player.attackCounter > 50 ) {
         // 3연발 탄환 생성
-        generateBullet(player, player.aimAngle - 5);
-        generateBullet(player, player.aimAngle);
-        generateBullet(player, player.aimAngle + 5);
+        //generateBullet(player, player.aimAngle - 5);
+        //generateBullet(player, player.aimAngle);
+        //generateBullet(player, player.aimAngle + 5);
+        // 방사형 탄환 생성
+        for( var angle=0; angle < 360; angle++ ){
+            generateBullet(player, angle);
+        }
         player.attackCounter = 0;
     }
     mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
