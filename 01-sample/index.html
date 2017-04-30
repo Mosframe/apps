@@ -1,4 +1,4 @@
-<!-- DONE : 적군 2종류로 확장 : 박쥐=(공격속도가 느리고 생명력이 강함), 벌=(공격속도가 빠르고 생명력이 약함) -->
+<!-- DONE : 각종 전역함수들 오브젝트에 종속시킴 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -140,9 +140,9 @@ update = function () {
     ++frameCount;
     ++score;
 
-    updateBullet();
-    updateUpgrade();
-    updateEnemy();
+    Bullet.update();
+    Upgrade.update();
+    Enemy.update();
     player.update();
 
     ctx.fillText(player.hp + " Hp", 0, 30 );
@@ -154,14 +154,14 @@ startNewGame = function() {
     player.hp           = 10;
     frameCount          = 0;
     score               = 0;
-    enemies             = {};
-    upgrades            = {};
-    bullets             = {};
+    Enemy.list          = {};
+    Upgrade.list        = {};
+    Bullet.list         = {};
     timeWhenGameStarted = Date.now();
 
-    randomlyGenerateEnemy();
-    randomlyGenerateEnemy();
-    randomlyGenerateEnemy();
+    Enemy.randomlyGenerate();
+    Enemy.randomlyGenerate();
+    Enemy.randomlyGenerate();
 }
 
 // -----------------------------------------------------------------------------

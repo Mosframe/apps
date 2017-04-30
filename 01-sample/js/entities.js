@@ -3,10 +3,6 @@
 // -----------------------------------------------------------------------------
 
 var player;
-var enemies     = {};
-var upgrades    = {};
-var bullets     = {};
-
 
 // -----------------------------------------------------------------------------
 // 엔티티
@@ -95,7 +91,7 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         // 탄환 생성
         if( self.attackCounter > 25 ) { // 매 1초마다
             self.attackCounter = 0;
-            generateBullet(self);
+            Bullet.generate(self);
         }
     }
     // 특수 공격 수행
@@ -104,12 +100,12 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         if( self.attackCounter > 50 ) {
 
             // 3연발 탄환 생성
-            generateBullet(self, self.aimAngle - 5);
-            generateBullet(self, self.aimAngle);
-            generateBullet(self, self.aimAngle + 5);
+            Bullet.generate(self, self.aimAngle - 5);
+            Bullet.generate(self, self.aimAngle);
+            Bullet.generate(self, self.aimAngle + 5);
             // 방사형 탄환 생성
             //for( var angle=0; angle < 360; angle++ ){
-            //    generateBullet(self, angle);
+            //    Bullet.generate(self, angle);
             //}
 
             self.attackCounter = 0;
@@ -123,11 +119,6 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
 // 플레이어
 Player = function(){
     var self = Actor( 'player','myId', 50, 40, 50, 70, images.player, 10, 1 );
-
-    self.pressingDown    = false;
-    self.pressingUp      = false;
-    self.pressingLeft    = false;
-    self.pressingRight   = false;
 
     // 위치 갱신
     self.updatePosition = function() {
@@ -166,6 +157,16 @@ Player = function(){
         startNewGame();
     }
 
+    // 이동 4방향키가 눌려있는지..
+    self.pressingDown    = false;
+    self.pressingUp      = false;
+    self.pressingLeft    = false;
+    self.pressingRight   = false;
+
+    // 마우스 버튼이 눌려있는지...
+    self.pressingMouseLeft  = false;
+    self.pressingMouseRight = false;
+
     return self;
 }
 
@@ -174,7 +175,7 @@ Player = function(){
 Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
     var self = Actor('enemy',id,x,y,width,height,image,hp,attackSpeed );
     self.toRemove   = false;
-    enemies[id]     = self;
+    Enemy.list[id]  = self;
 
     // 갱신
     var super_update = self.update;
@@ -216,24 +217,25 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         }
     }
 }
+Enemy.list = {};
 // 적군 갱신
-updateEnemy = function() {
+Enemy.update = function() {
     // 생성
     if( frameCount % 100 === 0 ) // 4초 마다 = 100/25fps
-        randomlyGenerateEnemy();
+        Enemy.randomlyGenerate();
     // 갱신
-    for( var key in enemies ) {
-        enemies[key].update();
+    for( var key in Enemy.list ) {
+        Enemy.list[key].update();
     }
     // 죽음
-    for( var key in enemies ) {
-        if( enemies[key].toRemove ) {
-            delete enemies[key];
+    for( var key in Enemy.list ) {
+        if( Enemy.list[key].toRemove ) {
+            delete Enemy.list[key];
         }
     }
 }
 // 무작위로 적군 생성
-randomlyGenerateEnemy = function() {
+Enemy.randomlyGenerate = function() {
     var id      = Math.random();
     var x       = Math.random() * currentMap.width;
     var y       = Math.random() * currentMap.height;
@@ -250,8 +252,8 @@ randomlyGenerateEnemy = function() {
 // 강화 아이템
 Upgrade = function ( id, x, y, width, height, category, image ) {
     var self = Entity('upgrade',id,x,y,width,height,image);
-    self.category = category;
-    upgrades[id] = self;
+    self.category   = category;
+    Upgrade.list[id]= self;
 
     var super_update = self.update;
     self.update = function() {
@@ -265,22 +267,23 @@ Upgrade = function ( id, x, y, width, height, category, image ) {
             if( self.category === 'attackSpeed' ) {
                 player.attackSpeed += 3;
             }
-            delete upgrades[self.id];
+            delete Upgrade.list[self.id];
         }
     }
 }
+Upgrade.list = {};
 // 강화 아이템 갱신
-updateUpgrade = function() {
+Upgrade.update = function() {
     // 생성
     if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
-        randomlyGenerateUpgrade();
+        Upgrade.randomlyGenerate();
     // 갱신
-    for( var key in upgrades ) {
-        upgrades[key].update();
+    for( var key in Upgrade.list ) {
+        Upgrade.list[key].update();
     }
 }
 // 무작위로 강화 아이템 생성
-randomlyGenerateUpgrade = function() {
+Upgrade.randomlyGenerate = function() {
     var id      = Math.random();
     var x       = Math.random() * currentMap.width;
     var y       = Math.random() * currentMap.height;
@@ -306,7 +309,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
     self.combatType = combatType;
     self.speedX     = speedX;
     self.speedY     = speedY;
-    bullets[id]     = self;
+    Bullet.list[id] = self;
 
     var super_update = self.update;
     self.update = function() {
@@ -322,10 +325,10 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
 
         // 적군과 충돌 처리
         if( self.combatType === 'player' ) {
-            for( var key2 in enemies ) {
-                if( self.testCollision( enemies[key2] ) ) {
+            for( var key2 in Enemy.list ) {
+                if( self.testCollision( Enemy.list[key2] ) ) {
                    toRemove = true;
-                    enemies[key2].hp -= 1;
+                    Enemy.list[key2].hp -= 1;
                 }
             }
         } else if( self.combatType === 'enemy' ) {
@@ -336,7 +339,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
         }
 
         if( toRemove ) {
-            delete bullets[self.id];
+            delete Bullet.list[self.id];
         }
     }
     self.updatePosition = function() {
@@ -351,15 +354,16 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
         }
     }
 }
+Bullet.list = {};
 // 탄환 갱신
-updateBullet = function() {
+Bullet.update = function() {
     // 갱신
-    for( var key in bullets ) {
-        bullets[key].update();
+    for( var key in Bullet.list ) {
+        Bullet.list[key].update();
     }
 }
 // 탄환 생성
-generateBullet = function( actor, overwriteAngle ) {
+Bullet.generate = function( actor, overwriteAngle ) {
     var id      = Math.random();
     var x       = actor.x;
     var y       = actor.y;
