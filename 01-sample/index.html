@@ -1,15 +1,15 @@
-<!-- 적들 생성을 함수화 시켜본다.  -->
+<!-- 플레이어와 적들이 충돌했는지 콘솔창으로 통해 확인한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
+
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
 
 // 변수화
 var WIDTH    = 500;
 var HEIGHT   = 500;
-var message  = '바운드됨';
 
 // player
 var player = {
@@ -22,6 +22,23 @@ var player = {
 
 // enemy
 var enemies = {};
+Enemy('E1',150,350,10, 15);
+Enemy('E2',250,350,10,-15);
+Enemy('E3',250,150,10,-8);
+
+
+// 두 물체 사이의 거리값을 구한다.
+function getDistanceBetweenEntity( entity1, entity2 ) {
+    var vx = entity1.x - entity2.x;
+    var vy = entity1.y - entity2.y;
+    return Math.sqrt( vx*vx + vy*vy );
+}
+
+// 두 물체가 충돌했는지 알아낸다.
+function testCollisionEntity( entity1, entity2 ) {
+    var distance = getDistanceBetweenEntity( entity1, entity2 );
+    return distance < 30;
+}
 
 function Enemy( id, x, y, speedX, speedY ) {
     var enemy = {
@@ -35,10 +52,6 @@ function Enemy( id, x, y, speedX, speedY ) {
     enemies[id] = enemy;
 }
 
-Enemy('E1',150,350,10, 15);
-Enemy('E2',250,350,10,-15);
-Enemy('E3',250,150,10,-8);
-
 
 setInterval( update, 40 );
 
@@ -49,11 +62,9 @@ function updateEntity( something ) {
     ctx.fillText(something.name, something.x, something.y);
 
     if( something.x < 0 || something.x > WIDTH ) {
-        console.log( message );
         something.speedX = -something.speedX;
     }
     if( something.y < 0 || something.y > HEIGHT ) {
-        console.log( message );
         something.speedY = -something.speedY;
     }
 }
@@ -64,6 +75,11 @@ function update() {
 
     for( var key in enemies ) {
         updateEntity(enemies[key]);
+
+        var isColliding = testCollisionEntity( player, enemies[key] );
+        if( isColliding ) {
+            console.log('colliding!');
+        }
     }
 
     updateEntity(player);
