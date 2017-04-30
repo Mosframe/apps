@@ -1,4 +1,4 @@
-<!-- 탄환을 마우스커서가 있는 방향으로 발사  -->
+<!-- 마우스 우클릭으로 3연발 발사  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -73,15 +73,17 @@ testCollisionEntity = function ( entity1, entity2 ) {
 // 적군 생성 함수
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
     var enemy = {
-        id      : id,
-        x       : x,
-        y       : y,
-        speedX  : speedX,
-        speedY  : speedY,
-        name    : 'Enemy',
-        width   : width,
-        height  : height,
-        color   : 'red',
+        id          : id,
+        x           : x,
+        y           : y,
+        speedX      : speedX,
+        speedY      : speedY,
+        name        : 'Enemy',
+        width       : width,
+        height      : height,
+        color       : 'red',
+
+        aimAngle    : 0,
     };
     enemies[id] = enemy;
 }
@@ -155,11 +157,14 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
 }
 
 // 탄환 생성
-generateBullet = function() {
+generateBullet = function( actor, overwriteAngle ) {
     var id      = Math.random();
-    var x       = player.x;
-    var y       = player.y;
-    var angle   = player.aimAngle;
+    var x       = actor.x;
+    var y       = actor.y;
+    var angle   = actor.aimAngle;
+    if( overwriteAngle !== undefined ) {
+        angle = overwriteAngle;
+    }
     var speedX  = Math.cos(angle/180*Math.PI)*5;
     var speedY  = Math.sin(angle/180*Math.PI)*5;
     var width   = 10;
@@ -212,13 +217,25 @@ document.onmousemove = function( mouse ) {
     player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
 }
 
-// 마우스 클릭
+// 마우스 좌클릭
 document.onclick = function( mouse ) {
     // 탄환 생성
-    if( player.attackCounter > 25 ) {
-        generateBullet();
+    if( player.attackCounter > 25 ) { // 매 1초마다
+        generateBullet(player);
         player.attackCounter = 0;
     }
+}
+
+// 마우스 우클릭
+document.oncontextmenu = function( mouse ) {
+    if( player.attackCounter > 50 ) {
+        // 3연발 탄환 생성
+        generateBullet(player, player.aimAngle - 5);
+        generateBullet(player, player.aimAngle);
+        generateBullet(player, player.aimAngle + 5);
+        player.attackCounter = 0;
+    }
+    mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
 }
 
 // 키보드 키 다운 이벤트
