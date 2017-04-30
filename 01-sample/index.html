@@ -1,4 +1,4 @@
-<!-- 모든 객체들의 구조를 Entity로 통합하여 최적화한다 -->
+<!-- Entity로 모든 객체를 상속관계로 정리함 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -12,35 +12,41 @@ var WIDTH    = 500;
 var HEIGHT   = 500;
 var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
 
-
 var frameCount = 0;
 
 var score = 0;
 var player;
 
+Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
+    var self = {
+        type            : type,
+        id              : id,
+        x               : x,
+        y               : y,
+        speedX          : speedX,
+        speedY          : speedY,
+        width           : width,
+        height          : height,
+        color           : color,
+    }
+    return self;
+}
+
 // 플레이어 생성
 createPlayer = function(){
-    player = {
-        type            : 'player',
-        x               : 50,
-        y               : 40,
-        speedX          : 30,
-        speedY          : 5,
-        name            : 'Player',
-        hp              : 10,
-        width           : 20,
-        height          : 40,
-        color           : 'green',
+    var self = Entity('player','myId',50,40,30,5,20,20,'green');
 
-        attackSpeed     : 1, // 공격속도 (초당 발사량)
-        attackCounter   : 0, // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-        aimAngle        : 0, // 공격방향(각도)
+    self.hp              = 10   ;
+    self.attackSpeed     =  1   ; // 공격속도 (초당 발사량)
+    self.attackCounter   =  0   ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle        =  0   ; // 공격방향(각도)
 
-        pressingDown    : false,
-        pressingUp      : false,
-        pressingLeft    : false,
-        pressingRight   : false,
-    };
+    self.pressingDown    = false;
+    self.pressingUp      = false;
+    self.pressingLeft    = false;
+    self.pressingRight   = false;
+
+    player = self;
 }
 
 // 적군들
@@ -76,22 +82,14 @@ testCollisionEntity = function ( entity1, entity2 ) {
 
 // 적군 생성 함수
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
-    var enemy = {
-        type            : 'enemy',
-        id              : id,
-        x               : x,
-        y               : y,
-        speedX          : speedX,
-        speedY          : speedY,
-        name            : 'Enemy',
-        width           : width,
-        height          : height,
-        color           : 'red',
-        attackSpeed     : 1, // 공격속도 (초당 발사량)
-        attackCounter   : 0, // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-        aimAngle        : 0, // 공격방향(각도)
-    };
-    enemies[id] = enemy;
+    var self = Entity('enemy',id,x,y,speedX,speedY,width,height,'red');
+
+    self.hp              = 10;
+    self.attackSpeed     = 1; // 공격속도 (초당 발사량)
+    self.attackCounter   = 0; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle        = 0; // 공격방향(각도)
+
+    enemies[id] = self;
 }
 
 // 무작위로 적군 생성
@@ -108,20 +106,10 @@ randomlyGenerateEnemy = function() {
 
 // 강화 아이템 생성 함수
 Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
-    var upgrade = {
-        type    : 'upgrade',
-        id      : id,
-        x       : x,
-        y       : y,
-        speedX  : speedX,
-        speedY  : speedY,
-        name    : 'Upgrade',
-        width   : width,
-        height  : height,
-        color   : color,
-        category: category,
-    };
-    upgrades[id] = upgrade;
+    var self = Entity('upgrade',id,x,y,speedX,speedY,width,height,color);
+
+    self.category = category;
+    upgrades[id] = self;
 }
 
 // 무작위로 강화 아이템 생성
@@ -147,21 +135,10 @@ randomlyGenerateUpgrade = function() {
 
 // 탄환 생성 함수
 Bullet = function ( id, x, y, speedX, speedY, width, height ) {
-    var bullet = {
-        type    : 'bullet',
-        id      : id,
-        x       : x,
-        y       : y,
-        speedX  : speedX,
-        speedY  : speedY,
-        name    : 'Bullet',
-        width   : width,
-        height  : height,
-        color   : 'black',
-        //
-        lifeTime : 100,
-    };
-    bullets[id] = bullet;
+    var self = Entity('bullet',id,x,y,speedX,speedY,width,height,'black');
+
+    self.lifeTime = 100;
+    bullets[id] = self;
 }
 
 // 탄환 생성
