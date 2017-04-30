@@ -1,4 +1,4 @@
-<!-- 강화 아이템 추가  -->
+<!-- 강화 아이템 획득하면 점수를 추가 획득한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -187,6 +187,12 @@ update = function () {
     // 강화 아이템 갱신
     for( var key in upgrades ) {
         updateEntity(upgrades[key]);
+
+        var isColliding = testCollisionEntity( player, upgrades[key] );
+        if( isColliding ) {
+            score += 1000;
+            delete upgrades[key];
+        }
     }
 
     // 적군 갱신
@@ -216,6 +222,7 @@ startNewGame = function() {
     frameCount          = 0;
     score               = 0;
     enemies             = {};
+    upgrades            = {};
     timeWhenGameStarted = Date.now();
 
     randomlyGenerateEnemy();
