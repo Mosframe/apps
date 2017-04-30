@@ -180,6 +180,24 @@ Enemy = function ( id, x, y, width, height ) {
             player.hp = player.hp - 1;
         }
     }
+    self.updatePosition = function() {
+
+        // 플레이어를 따라다닌다.
+        var diffX = player.x - self.x;
+        var diffY = player.y - self.y;
+
+        if( diffX > 0 ) {
+            self.x += 3;
+        } else {
+            self.x -= 3;
+        }
+
+        if( diffY > 0 ) {
+            self.y += 3;
+        } else {
+            self.y -= 3;
+        }
+    }
 
     enemies[id] = self;
 }
