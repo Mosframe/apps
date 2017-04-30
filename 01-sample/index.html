@@ -1,4 +1,4 @@
-<!-- Entity > Actor > (Player,Enemy) 으로 상속되도록 처리함 -->
+<!-- update함수를 오버라이딩을 이용하여 개선 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -102,7 +102,7 @@ Actor = function( type, id, x, y, speedX, speedY, width, height, color, hp, atta
     self.attackCounter   =  0           ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
     self.aimAngle        =  0           ; // 공격방향(각도)
 
-    // 깅신
+    // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
@@ -177,6 +177,17 @@ Player = function(){
         if( self.y > HEIGHT-self.height/2 )
             self.y = HEIGHT-self.height/2;
     }
+    // 갱신
+    var super_update = self.update;
+    self.update = function() {
+        super_update();
+
+        if( self.hp <= 0 ) {
+            var timeSurvived = Date.now() - timeWhenGameStarted;
+            console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+            startNewGame();
+        }
+    }
 
     return self;
 }
@@ -191,6 +202,20 @@ var enemies = {};
 // 적군 생성 함수
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
     var self = Actor('enemy',id,x,y,speedX,speedY,width,height,'red', 10, 1 );
+
+    var super_update = self.update;
+    self.update = function() {
+        super_update();
+
+        self.performAttack();
+
+        var isColliding = player.testCollision( self );
+        if( isColliding ) {
+            console.log('colliding!');
+            player.hp = player.hp - 1;
+        }
+    }
+
     enemies[id] = self;
 }
 
@@ -214,6 +239,22 @@ var upgrades = {};
 // 강화 아이템 생성 함수
 Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
     var self = Entity('upgrade',id,x,y,speedX,speedY,width,height,color);
+
+    var super_update = self.update;
+    self.update = function() {
+        super_update();
+
+        var isColliding = player.testCollision( self );
+        if( isColliding ) {
+            if( self.category === 'score' ) {
+                score += 1000;
+            }
+            if( self.category === 'attackSpeed' ) {
+                player.attackSpeed += 3;
+            }
+            delete upgrades[self.id];
+        }
+    }
 
     self.category = category;
     upgrades[id] = self;
@@ -248,8 +289,37 @@ var bullets = {};
 // 탄환 생성 함수
 Bullet = function ( id, x, y, speedX, speedY, width, height ) {
     var self = Entity('bullet',id,x,y,speedX,speedY,width,height,'black');
-
     self.lifeTime = 100;
+
+    var super_update = self.update;
+    self.update = function() {
+        super_update();
+
+        var toRemove = false;
+
+        // 생명력 처리
+        self.lifeTime--;
+        if( self.lifeTime <= 0 ) {
+            toRemove = true;
+        }
+
+        // 적군과 충돌 처리
+        for( var key2 in enemies ) {
+            /*
+            var isColliding = self.testCollision( enemies[key2] );
+            if( isColliding ) {
+                toRemove = true;
+                delete enemies[key2];
+                break;
+            }
+            */
+        }
+
+        if( toRemove ) {
+            delete bullets[self.id];
+        }
+    }
+
     bullets[id] = self;
 }
 
@@ -337,70 +407,22 @@ update = function () {
     if( frameCount % 75 === 0 ) // 3초 마다 = 75/25fps
         randomlyGenerateUpgrade();
 
-    // 탄환 생성
-    player.attackCounter += player.attackSpeed; // 플레이어 공격속도에 따라서
-
     // 탄환 갱신
     for( var key in bullets ) {
         bullets[key].update();
-
-        var toRemove = false;
-
-        // 생명력 처리
-        bullets[key].lifeTime--;
-        if( bullets[key].lifeTime <= 0 ) {
-            toRemove = true;
-        }
-
-        // 적군과 충돌 처리
-        for( var key2 in enemies ) {
-            /*
-            var isColliding = bullets[key].testCollision( enemies[key2] );
-            if( isColliding ) {
-                toRemove = true;
-                delete enemies[key2];
-                break;
-            }
-            */
-        }
-
-        if( toRemove ) {
-            delete bullets[key];
-        }
     }
 
     // 강화 아이템 갱신
     for( var key in upgrades ) {
         upgrades[key].update();
-        var isColliding = player.testCollision( upgrades[key] );
-        if( isColliding ) {
-            if( upgrades[key].category === 'score' ) {
-                score += 1000;
-            }
-            if( upgrades[key].category === 'attackSpeed' ) {
-                player.attackSpeed += 3;
-            }
-            delete upgrades[key];
-        }
     }
 
     // 적군 갱신
     for( var key in enemies ) {
         enemies[key].update();
-        enemies[key].performAttack();
-
-        var isColliding = player.testCollision( enemies[key] );
-        if( isColliding ) {
-            console.log('colliding!');
-            player.hp = player.hp - 1;
-        }
     }
 
-    if( player.hp <= 0 ) {
-        var timeSurvived = Date.now() - timeWhenGameStarted;
-        console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
-        startNewGame();
-    }
+    // 플레이어 갱신
     player.update();
 
     ctx.fillText(player.hp + " Hp", 0, 30 );
