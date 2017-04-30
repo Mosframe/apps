@@ -42,8 +42,18 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,image) {
     // 그리기
     self.draw = function() {
         ctx.save();
-        var x = self.x-self.width/2;
-        var y = self.y-self.height/2;
+
+        //var x = self.x-self.width/2;
+        //var y = self.y-self.height/2;
+
+        // 플레이어와 떨어진 거리만큼 위치시킨다.
+        var x = self.x - player.x;
+        var y = self.y - player.y;
+        x += WIDTH/2;
+        y += HEIGHT/2;
+        x -= self.width/2;
+        y -= self.height/2;
+
         ctx.drawImage(self.image,0,0,self.image.width,self.image.height,x,y,width,height);
         ctx.restore();
     }

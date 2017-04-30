@@ -1,4 +1,4 @@
-<!-- DONE : 배경 이미지 그리기 -->
+<!-- DONE : 플레이어 중심으로 맵과 엔티티들 스크롤하기 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -100,7 +100,9 @@ document.onkeyup = function( event ) {
 
 // update
 update = function () {
-    drawMap();
+    ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
+
+    drawMap(); // 맵 그리기
 
     ++frameCount;
     ++score;
@@ -164,6 +166,9 @@ setInterval( update, 40 ); // 1000/40=25fps
 // -----------------------------------------------------------------------------
 // 맵
 drawMap = function() {
-    ctx.drawImage( images.map, 0, 0 );
+    x = WIDTH/2 - player.x;
+    y = HEIGHT/2 - player.y;
+
+    ctx.drawImage( images.map, 0, 0, images.map.width, images.map.height, x, y, images.map.width*2, images.map.height*2 );
 }
 </script>
