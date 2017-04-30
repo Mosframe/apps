@@ -1,10 +1,25 @@
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<!-- 채팅출력창 -->
+<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+    <div>Hello!</div>
+</div>
+
+<!-- 채팅입력창 -->
+<form id="chat-form">
+    <input id="chat-input" type="text" style="width:500px"></input>
+</form>
+
 <!-- https://cdnjs.com/ 에서 socket.io를 검색하여 원하는 버전을 사용한다.-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script>
 
-var ctx = document.getElementById("ctx").getContext("2d");
+var ctx         = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍스트
+var chatText    = document.getElementById('chat-text'   ); // 채팅 출력 문자열
+var chatForm    = document.getElementById('chat-form'   ); // 채팅 입력 폼
+var chatInput   = document.getElementById('chat-input'  ); // 채팅 입력 입력창
+
 ctx.font = '20px Arial';
 
 // 서버에 접속한다.
@@ -31,6 +46,19 @@ socket.on('newPositions',function(data){
     ctx.restore();
 });
 
+// -----------------------------------------------------------------------------
+// 채팅 메시지를 채팅메시지 리스트에 추가한다.
+socket.on('addChat',function(data){
+    chatText.innerHTML += `<div>${data}</div>`;
+});
+
+// -----------------------------------------------------------------------------
+// 서버에 채팅 메시지를 전송한다.
+chatForm.onsubmit = function(e) {
+    e.preventDefault(); // 이벤트 전파를 막지 않고 이벤트 취소
+    socket.emit( 'sendChat', chatInput.value );
+    chatInput.value = '';
+}
 
 // -----------------------------------------------------------------------------
 // 키보드 키 다운 이벤트

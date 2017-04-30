@@ -181,6 +181,14 @@ io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
     // 플레이어 생성 및 등록
     Player.onConnect(socket);
+    socket.player = Player(socket.id);
+    // 채팅 입력 처리
+    socket.on('sendChat',function(data){
+        var playerName = socket.player.name;
+        for( var i in sockets ) {
+            sockets[i].emit('addChat', playerName + ' : ' + data );
+        }
+    });
     // 접속종료 처리
     socket.on('disconnect',function(){
         delete sockets[socket.id];
