@@ -1,18 +1,19 @@
 Hello world
 
+<meta charset="UTF-8">
 <!-- https://cdnjs.com/ 에서 socket.io를 검색하여 원하는 버전을 사용한다.-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script>
     // 서버에 접속한다.
     var socket = io();
 
-    var msg = function(){
-        // 서버에 메시지를 보낸다.
+    // 서버에 메시지를 보낸다.
+    var sendMsg = function(){
         socket.emit('message',{
             name:'mosframe'
         });
     }
-    msg();
+    //sendMsg();
 
     // 서버로 부터 데이터를 수신한다.
     socket.on('serverMsg',function(data){
@@ -20,3 +21,5 @@ Hello world
     });
 
 </script>
+
+<button onclick="sendMsg()">SendMessage</button>
