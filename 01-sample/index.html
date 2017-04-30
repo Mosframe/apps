@@ -1,4 +1,4 @@
-<!-- 마우스로 플레이어를 이동시킨다.  -->
+<!-- 플레이어의 생명력을 추가하고 적들과 충돌했을때 1씩 감소시키고 생명력이 0이되면 부활시킨다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -18,6 +18,7 @@ var player = {
     speedX  : 30,
     speedY  : 5,
     name    : 'P',
+    hp      : 10,
 }
 
 // enemy
@@ -88,10 +89,16 @@ update = function () {
         var isColliding = testCollisionEntity( player, enemies[key] );
         if( isColliding ) {
             console.log('colliding!');
+            player.hp = player.hp - 1;
+            if( player.hp <= 0 ) {
+                console.log("You Lost!");
+                player.hp = 10;
+            }
         }
     }
 
     drawEntity(player);
+    ctx.fillText(player.hp + " Hp", 0, 30 );
 }
 
 
