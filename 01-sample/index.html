@@ -1,4 +1,4 @@
-<!-- 플레이어와 적의 갱신을 함수들를 하나의 함수로 통합한다.  -->
+<!-- 적을 추가로 생성해 본다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -21,11 +21,18 @@ var player = {
 }
 
 // enemy
-var enemy = {
+var enemy1 = {
     x       : 150,
     y       : 350,
     speedX  : 10,
     speedY  : 15,
+    name    : 'E',
+};
+var enemy2 = {
+    x       : 100,
+    y       : 350,
+    speedX  : 10,
+    speedY  :-15,
     name    : 'E',
 };
 
@@ -49,7 +56,8 @@ function updateEntity( something ) {
 
 // update
 function update() {
-    updateEntity(enemy);
+    updateEntity(enemy1);
+    updateEntity(enemy2);
     updateEntity(player);
 }
 
