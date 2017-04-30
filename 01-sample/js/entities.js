@@ -76,6 +76,14 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     self.aimAngle           = 0             ; // 공격방향(각도)
     self.spriteAnimCounter  = 0             ; // 스프라이트 에니메이션 카운터
 
+    // 이동 4방향키가 눌려있는지..
+    self.pressingDown       = false;
+    self.pressingUp         = false;
+    self.pressingLeft       = false;
+    self.pressingRight      = false;
+
+    self.moveSpeedMax       = 3; // 최대 이동속도
+
     // 갱신
     var super_update = self.update;
     self.update = function() {
@@ -85,6 +93,43 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
             self.onDeath();
         }
     }
+    // 위치 갱신
+    self.updatePosition = function() {
+
+        var oldX = self.x;
+        var oldY = self.y;
+
+        // 이동
+        if( self.pressingRight ) {
+            self.x += self.moveSpeedMax;
+        }
+        if( self.pressingLeft ) {
+            self.x -= self.moveSpeedMax;
+        }
+        if( self.pressingDown ) {
+            self.y += self.moveSpeedMax;
+        }
+        if( self.pressingUp ) {
+            self.y -= self.moveSpeedMax;
+        }
+
+        // 이동제한
+        if( self.x < self.width/2 )
+            self.x = self.width/2;
+        if( self.x > Maps.current.width-self.width/2 )
+            self.x = Maps.current.width-self.width/2;
+        if( self.y < self.height/2 )
+            self.y = self.height/2;
+        if( self.y > Maps.current.height-self.height/2 )
+            self.y = Maps.current.height-self.height/2;
+
+        // 맵 오브젝트에 충돌처리
+        if( Maps.current.isPositionWall(self) ) {
+            self.x = oldX;
+            self.y = oldY;
+        }
+    }
+
     // 그리기
     self.draw = function() {
         ctx.save();
@@ -155,42 +200,11 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
 Player = function(){
     var self = Actor( 'player','myId', 0, 0, 50*1.5, 70*1.5, images.player, 10, 1 );
 
-    // 위치 갱신
-    self.updatePosition = function() {
+    self.moveSpeedMax       = 10; // 최대 이동속도
+    // 마우스 버튼이 눌려있는지...
+    self.pressingMouseLeft  = false;
+    self.pressingMouseRight = false;
 
-        var oldX = self.x;
-        var oldY = self.y;
-
-        // 이동
-        if( self.pressingRight ) {
-            self.x += 10;
-        }
-        if( self.pressingLeft ) {
-            self.x -= 10;
-        }
-        if( self.pressingDown ) {
-            self.y += 10;
-        }
-        if( self.pressingUp ) {
-            self.y -= 10;
-        }
-
-        // 이동제한
-        if( self.x < self.width/2 )
-            self.x = self.width/2;
-        if( self.x > Maps.current.width-self.width/2 )
-            self.x = Maps.current.width-self.width/2;
-        if( self.y < self.height/2 )
-            self.y = self.height/2;
-        if( self.y > Maps.current.height-self.height/2 )
-            self.y = Maps.current.height-self.height/2;
-
-        // 맵 오브젝트에 충돌처리
-        if( Maps.current.isPositionWall(self) ) {
-            self.x = oldX;
-            self.y = oldY;
-        }
-    }
     // 갱신
     var super_update = self.update;
     self.update = function() {
@@ -215,16 +229,6 @@ Player = function(){
         startNewGame();
     }
 
-    // 이동 4방향키가 눌려있는지..
-    self.pressingDown    = false;
-    self.pressingUp      = false;
-    self.pressingLeft    = false;
-    self.pressingRight   = false;
-
-    // 마우스 버튼이 눌려있는지...
-    self.pressingMouseLeft  = false;
-    self.pressingMouseRight = false;
-
     return self;
 }
 
@@ -241,6 +245,7 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         super_update();
         self.spriteAnimCounter  += 0.2;
         self.performAttack();
+        self.updateKeyPress();
         self.updateAim();
     }
     // 렌더링
@@ -270,38 +275,20 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         // Math.atan2(y,x) : (y/x)점의 각도를 라디안 단위로 계산하여 반환한다. : 반환범위 (atan -PI/2~PI/2, atan2는 -PI~PI)
         self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180;
     }
-    // 죽음
-    self.onDeath = function() {
-        self.toRemove = true;
-    }
-    // 위치 갱신
-    self.updatePosition = function() {
+    // 방향키 눌림 이벤트
+    self.updateKeyPress = function() {
 
-        var oldX = self.x;
-        var oldY = self.y;
-
-        // 플레이어를 따라다닌다.
         var diffX = player.x - self.x;
         var diffY = player.y - self.y;
 
-        if( diffX > 0 ) {
-            self.x += 3;
-        } else {
-            self.x -= 3;
-        }
-
-        if( diffY > 0 ) {
-            self.y += 3;
-        } else {
-            self.y -= 3;
-        }
-
-        // 맵 오브젝트에 충돌처리
-        if( Maps.current.isPositionWall(self) ) {
-            self.x = oldX;
-            self.y = oldY;
-        }
-
+        self.pressingRight  = diffX > 3;
+        self.pressingLeft   = diffX <-3;
+        self.pressingDown   = diffY > 3;
+        self.pressingUp     = diffY <-3;
+    }
+    // 죽음
+    self.onDeath = function() {
+        self.toRemove = true;
     }
 }
 Enemy.list = {};
@@ -396,41 +383,40 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
     self.combatType = combatType;
     self.speedX     = speedX;
     self.speedY     = speedY;
+    self.toRemove   = false;
     Bullet.list[id] = self;
 
     var super_update = self.update;
     self.update = function() {
         super_update();
 
-        var toRemove = false;
-
         // 생명력 처리
         self.lifeTime--;
         if( self.lifeTime <= 0 ) {
-            toRemove = true;
+            self.toRemove = true;
         }
 
         // 적군과 충돌 처리
         if( self.combatType === 'player' ) {
             for( var key2 in Enemy.list ) {
                 if( self.testCollision( Enemy.list[key2] ) ) {
-                   toRemove = true;
+                   self.toRemove = true;
                     Enemy.list[key2].hp -= 1;
                 }
             }
         // 플레이어와 충돌 처리
         } else if( self.combatType === 'enemy' ) {
             if( self.testCollision( player ) ) {
-                toRemove = true;
+                self.toRemove = true;
                 player.hp -= 1;
             }
         }
         // 맵 오브젝트에 충돌
         if( Maps.current.isPositionWall(self) ) {
-            toRemove = true;
+            self.toRemove = true;
         }
 
-        if( toRemove ) {
+        if( self.toRemove ) {
             delete Bullet.list[self.id];
         }
     }
