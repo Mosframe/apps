@@ -32,10 +32,10 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,image) {
         self.x += self.speedX;
         self.y += self.speedY;
 
-        if( self.x < 0 || self.x > WIDTH ) {
+        if( self.x < 0 || self.x > currentMap.width ) {
             self.speedX = -self.speedX;
         }
-        if( self.y < 0 || self.y > HEIGHT ) {
+        if( self.y < 0 || self.y > currentMap.height ) {
             self.speedY = -self.speedY;
         }
     }
@@ -157,12 +157,12 @@ Player = function(){
         // 이동제한
         if( self.x < self.width/2 )
             self.x = self.width/2;
-        if( self.x > WIDTH-self.width/2 )
-            self.x = WIDTH-self.width/2;
+        if( self.x > currentMap.width-self.width/2 )
+            self.x = currentMap.width-self.width/2;
         if( self.y < self.height/2 )
             self.y = self.height/2;
-        if( self.y > HEIGHT-self.height/2 )
-            self.y = HEIGHT-self.height/2;
+        if( self.y > currentMap.height-self.height/2 )
+            self.y = currentMap.height-self.height/2;
     }
     // 갱신
     var super_update = self.update;
@@ -201,8 +201,8 @@ Enemy = function ( id, x, y, speedX, speedY, width, height ) {
 // 무작위로 적군 생성
 randomlyGenerateEnemy = function() {
     var id      = Math.random();
-    var x       = Math.random() * WIDTH;
-    var y       = Math.random() * HEIGHT;
+    var x       = Math.random() * currentMap.width;
+    var y       = Math.random() * currentMap.height;
     var speedX  =  5 + Math.random() *  5; //  5 ~ 10
     var speedY  =  5 + Math.random() *  5; //  5 ~ 10
     var width   = 64;
@@ -237,8 +237,8 @@ Upgrade = function ( id, x, y, speedX, speedY, width, height, category, image ) 
 // 무작위로 강화 아이템 생성
 randomlyGenerateUpgrade = function() {
     var id      = Math.random();
-    var x       = Math.random() * WIDTH;
-    var y       = Math.random() * HEIGHT;
+    var x       = Math.random() * currentMap.width;
+    var y       = Math.random() * currentMap.height;
     var speedX  =  0;
     var speedY  =  0;
     var width   = 32;
@@ -286,7 +286,7 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
         }
 
         if( toRemove ) {
-            delete delete bullets[self.id];
+            delete bullets[self.id];
         }
     }
 

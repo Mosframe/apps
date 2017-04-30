@@ -1,4 +1,4 @@
-<!-- DONE : 맵을 오브젝트화 -->
+<!-- DONE : 맵 끝까지 탐험하기 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -46,7 +46,6 @@ Maps = function(id,imageSrc,width,height) {
     self.draw = function() {
         x = WIDTH/2 - player.x;
         y = HEIGHT/2 - player.y;
-
         ctx.drawImage( self.image, 0, 0, self.image.width, self.image.height, x, y, self.image.width*2, self.image.height*2 );
     }
     return self;
