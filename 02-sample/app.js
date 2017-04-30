@@ -1,4 +1,4 @@
-// DONE : Http 정적파일 서비스하기
+// DONE : WebSocket 서비스 시작
 
 // express 생성
 var express = require('express');
@@ -19,5 +19,11 @@ app.use('/client', express.static(__dirname + '/client/assets/'));
 
 // Http서버에서 2000 포트를 통해서 클라이언트 요청을 받는다.
 server.listen(2000);
+console.log('server started');
 
 
+// Socket.io를 통해 WebSocket 서비스를 시작한다.
+var io = require('socket.io')(server,{});
+io.sockets.on('connection', function(socket){
+    console.log('socket connection');
+});
