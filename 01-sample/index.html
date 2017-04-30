@@ -1,25 +1,26 @@
-<!-- 플레이어(P)를 캔버스에 일정속도값을 사용하여 이동시켜 출려해 본다. -->
+<!-- 플레이어(P)를 update함수를 사용하여 이동해 본다. -->
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
     var ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
 
-    var x = 100;
-    var y = 100;
-    var speedX = 50;
-    var speedY = 5;
+    var x       = 100;
+    var y       = 100;
+    var speedX  = 50;
+    var speedY  = 5;
 
-    x += speedX;
-    y += speedY;
-    ctx.fillText('P', x, y);
+    function update() {
+        x += speedX;
+        y += speedY;
+        ctx.fillText('P', x, y);
+    }
 
-    x += speedX;
-    y += speedY;
-    ctx.fillText('P', x, y);
+    update();
+    update();
+    update();
 
-    x += speedX;
-    y += speedY;
-    ctx.fillText('P', x, y);
+    // 크롬브라우저에서 디버깅 기능으로 브레이크포인트를 이용하여 순차적으로 실행해 본다.
+    // 콘솔창에서 변수값들을 확인해 본다.
 
 </script>
