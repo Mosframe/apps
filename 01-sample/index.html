@@ -1,4 +1,4 @@
-<!-- 수치들을 변수화 시킨다. -->
+<!-- update의 중복된 비교문을 간략화 시킨다. -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -10,6 +10,7 @@ var x       = 100;
 var y       = 100;
 var speedX  = 30;
 var speedY  = 5;
+var name    = 'P';
 
 // 변수화
 var WIDTH   = 500;
@@ -21,22 +22,14 @@ setInterval( update, 40 );
 function update() {
     x += speedX;
     y += speedY;
-    ctx.fillText('P', x, y);
+    ctx.fillText(name, x, y);
     console.log('x', x,'y',y);
 
-    if( x > WIDTH ) {
+    if( x < 0 || x > WIDTH ) {
         console.log( message );
         speedX = -speedX;
     }
-    if( x < 0 ) {
-        console.log( message );
-        speedX = -speedX;
-    }
-    if( y > HEIGHT ) {
-        console.log( message );
-        speedY = -speedY;
-    }
-    if( y < 0 ) {
+    if( y < 0 || y > HEIGHT ) {
         console.log( message );
         speedY = -speedY;
     }
