@@ -1,4 +1,4 @@
-<!-- 탄환에 생명력을 추가하여 일정시간이 지나면 자동 파괴한다.  -->
+<!-- 점수획득량이 다른 강화 아이템을 2종류 제작한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -90,7 +90,7 @@ randomlyGenerateEnemy = function() {
 }
 
 // 강화 아이템 생성 함수
-Upgrade = function ( id, x, y, speedX, speedY, width, height ) {
+Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
     var upgrade = {
         id      : id,
         x       : x,
@@ -100,7 +100,8 @@ Upgrade = function ( id, x, y, speedX, speedY, width, height ) {
         name    : 'Upgrade',
         width   : width,
         height  : height,
-        color   : 'orange',
+        color   : color,
+        category: category,
     };
     upgrades[id] = upgrade;
 }
@@ -114,7 +115,16 @@ randomlyGenerateUpgrade = function() {
     var speedY  =  0;
     var width   = 10;
     var height  = 10;
-    Upgrade( id, x, y, speedX, speedY, width, height );
+
+    if( Math.random()<0.5) {
+        var category    = 'low';
+        var color       = 'orange';
+    } else {
+        var category    = 'high';
+        var color       = 'purple';
+    }
+
+    Upgrade( id, x, y, speedX, speedY, width, height, category, color );
 }
 
 // 탄환 생성 함수
@@ -253,7 +263,12 @@ update = function () {
 
         var isColliding = testCollisionEntity( player, upgrades[key] );
         if( isColliding ) {
-            score += 1000;
+            if( upgrades[key].category === 'low' ) {
+                score += 1000;
+            }
+            if( upgrades[key].category === 'high' ) {
+                score += 10000;
+            }
             delete upgrades[key];
         }
     }
