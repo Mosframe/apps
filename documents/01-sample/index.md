@@ -63,5 +63,6 @@
 051. Entity update함수 정리
 052. Entity 멤버함수들 정리
 053. 충돌 체크함수도 Entity 멤버함수로 정리
+054. Entity > Actor > (Player,Enemy) 으로 상속되도록 처리함
 
 [index.html](../../01-sample/index.html)
