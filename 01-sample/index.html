@@ -1,4 +1,4 @@
-<!-- 플레이어와 적의 갱신을 함수로 구현한다.  -->
+<!-- 플레이어와 적의 갱신을 함수들를 하나의 함수로 통합한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -31,42 +31,26 @@ var enemy = {
 
 setInterval( update, 40 );
 
-// update player
-function updatePlayer() {
-    player.x += player.speedX;
-    player.y += player.speedY;
-    ctx.fillText(player.name, player.x, player.y);
+// update entity
+function updateEntity( something ) {
+    something.x += something.speedX;
+    something.y += something.speedY;
+    ctx.fillText(something.name, something.x, something.y);
 
-    if( player.x < 0 || player.x > WIDTH ) {
+    if( something.x < 0 || something.x > WIDTH ) {
         console.log( message );
-        player.speedX = -player.speedX;
+        something.speedX = -something.speedX;
     }
-    if( player.y < 0 || player.y > HEIGHT ) {
+    if( something.y < 0 || something.y > HEIGHT ) {
         console.log( message );
-        player.speedY = -player.speedY;
-    }
-}
-
-// update enemy
-function updateEnemy() {
-    enemy.x += enemy.speedX;
-    enemy.y += enemy.speedY;
-    ctx.fillText(enemy.name, enemy.x, enemy.y);
-
-    if( enemy.x < 0 || enemy.x > WIDTH ) {
-        console.log( message );
-        enemy.speedX = -enemy.speedX;
-    }
-    if( enemy.y < 0 || enemy.y > HEIGHT ) {
-        console.log( message );
-        enemy.speedY = -enemy.speedY;
+        something.speedY = -something.speedY;
     }
 }
 
 // update
 function update() {
-    updatePlayer();
-    updateEnemy();
+    updateEntity(enemy);
+    updateEntity(player);
 }
 
 </script>
