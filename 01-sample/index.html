@@ -1,4 +1,4 @@
-<!-- DONE : entities를 별도의 소스 파일로 분리시킴 -->
+<!-- DONE : 객체들을 박스에서 이미지로 변경 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -19,6 +19,20 @@ var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
 var frameCount  = 0;
 var score       = 0;
 
+var images = {};
+images.player = new Image();
+images.player.src   = "images/player.png";
+images.enemy = new Image();
+images.enemy.src    = "images/enemy.png";
+images.bullet = new Image();
+images.bullet.src   = "images/bullet.png";
+images.upgrade1 = new Image();
+images.upgrade1.src = "images/upgrade1.png";
+images.upgrade2 = new Image();
+images.upgrade2.src = "images/upgrade2.png";
+images.map = new Image();
+images.map.src      = "images/map.png";
+
 // -----------------------------------------------------------------------------
 // 유틸리티
 
@@ -29,7 +43,6 @@ return rect1.x <= rect2.x+rect2.width
     && rect1.y <= rect2.y+rect2.height
     && rect2.y <= rect1.y+rect1.height;
 }
-
 // -----------------------------------------------------------------------------
 // 이벤트 리스너
 

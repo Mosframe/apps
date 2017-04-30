@@ -10,7 +10,7 @@ var bullets     = {};
 
 // -----------------------------------------------------------------------------
 // 엔티티
-Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
+Entity = function(type,id,x,y,speedX,speedY,width,height,image) {
     var self = {
         type    : type,
         id      : id,
@@ -20,7 +20,7 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
         speedY  : speedY,
         width   : width,
         height  : height,
-        color   : color,
+        image   : image,
     }
     // 갱신
     self.update = function () {
@@ -42,8 +42,9 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
     // 그리기
     self.draw = function() {
         ctx.save();
-        ctx.fillStyle = self.color;
-        ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        var x = self.x-self.width/2;
+        var y = self.y-self.height/2;
+        ctx.drawImage(self.image,x,y);
         ctx.restore();
     }
     // 두 물체 사이의 거리값을 구한다.
@@ -74,8 +75,8 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
 
 // -----------------------------------------------------------------------------
 // 액터
-Actor = function( type, id, x, y, speedX, speedY, width, height, color, hp, attackSpeed ) {
-    var self = Entity( type, id, x, y, speedX, speedY, width, height, color );
+Actor = function( type, id, x, y, speedX, speedY, width, height, image, hp, attackSpeed ) {
+    var self = Entity( type, id, x, y, speedX, speedY, width, height, image );
 
     self.hp              = hp           ;
     self.attackSpeed     = attackSpeed  ; // 공격속도 (초당 발사량)
@@ -121,7 +122,7 @@ Actor = function( type, id, x, y, speedX, speedY, width, height, color, hp, atta
 // -----------------------------------------------------------------------------
 // 플레이어
 Player = function(){
-    var self = Actor( 'player','myId', 50, 40, 30, 5, 20, 20, 'green', 10, 1 );
+    var self = Actor( 'player','myId', 50, 40, 30, 5, 20, 20, images.player, 10, 1 );
 
     self.pressingDown    = false;
     self.pressingUp      = false;
@@ -171,7 +172,7 @@ Player = function(){
 // -----------------------------------------------------------------------------
 // 적군
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
-    var self = Actor('enemy',id,x,y,speedX,speedY,width,height,'red', 10, 1 );
+    var self = Actor('enemy',id,x,y,speedX,speedY,width,height,images.enemy, 10, 1 );
 
     var super_update = self.update;
     self.update = function() {
@@ -201,8 +202,8 @@ Enemy = function ( id, x, y, speedX, speedY, width, height ) {
 
 // -----------------------------------------------------------------------------
 // 강화 아이템
-Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
-    var self = Entity('upgrade',id,x,y,speedX,speedY,width,height,color);
+Upgrade = function ( id, x, y, speedX, speedY, width, height, category, image ) {
+    var self = Entity('upgrade',id,x,y,speedX,speedY,width,height,image);
 
     var super_update = self.update;
     self.update = function() {
@@ -235,19 +236,19 @@ randomlyGenerateUpgrade = function() {
 
     if( Math.random()<0.5) {
         var category    = 'score';
-        var color       = 'orange';
+        var image       = images.upgrade1;
     } else {
         var category    = 'attackSpeed';
-        var color       = 'purple';
+        var image       = images.upgrade2;
     }
 
-    Upgrade( id, x, y, speedX, speedY, width, height, category, color );
+    Upgrade( id, x, y, speedX, speedY, width, height, category, image );
 }
 
 // -----------------------------------------------------------------------------
 // 탄환
 Bullet = function ( id, x, y, speedX, speedY, width, height ) {
-    var self = Entity('bullet',id,x,y,speedX,speedY,width,height,'black');
+    var self = Entity('bullet',id,x,y,speedX,speedY,width,height,images.bullet);
     self.lifeTime = 100;
 
     var super_update = self.update;
