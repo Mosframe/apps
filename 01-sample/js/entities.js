@@ -169,17 +169,25 @@ Player = function(){
 Enemy = function ( id, x, y, width, height ) {
     var self = Actor('enemy',id,x,y,width,height,images.enemy, 10, 1 );
 
+    // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
         self.performAttack();
-
-        var isColliding = player.testCollision( self );
-        if( isColliding ) {
-            console.log('colliding!');
-            player.hp = player.hp - 1;
-        }
+        self.updateAim();
     }
+
+    // 총구 방향 갱신
+    self.updateAim = function() {
+
+        var diffX = player.x - self.x;
+        var diffY = player.y - self.y;
+
+        // Math.atan2(y,x) : (y/x)점의 각도를 라디안 단위로 계산하여 반환한다. : 반환범위 (atan -PI/2~PI/2, atan2는 -PI~PI)
+        self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180;
+    }
+
+    // 위치 갱신
     self.updatePosition = function() {
 
         // 플레이어를 따라다닌다.

@@ -1,4 +1,4 @@
-<!-- DONE : 적들이 플레이어를 따라오도록 한다 -->
+<!-- DONE : 적군이 플렝이어의 방향으로 총알을 발사하도록 함 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -73,6 +73,7 @@ document.onmousemove = function( mouse ) {
     mouseX -= WIDTH/2;
     mouseY -= HEIGHT/2;
 
+    // Math.atan2(y,x) : (y/x)점의 각도를 라디안 단위로 계산하여 반환한다. : 반환범위 (atan -PI/2~PI/2, atan2는 -PI~PI)
     player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
 }
 
