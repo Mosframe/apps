@@ -27,11 +27,35 @@ var players = {};
 // 플레이어 클래스
 var Player = function(id) {
     var self = {
-        x:250,
-        y:250,
-        id:id,
-        name : "" + Math.floor(10*Math.random()),
+        x               : 250,
+        y               : 250,
+        id              : id,
+        name            : "" + Math.floor(10*Math.random()),
+        pressingDown    : false,
+        pressingUp      : false,
+        pressingLeft    : false,
+        pressingRight   : false,
+        moveSpeedMax    : 10,
     }
+
+    self.updatePosition = function() {
+
+        // 이동
+        if( self.pressingRight ) {
+            self.x += self.moveSpeedMax;
+        }
+        if( self.pressingLeft ) {
+            self.x -= self.moveSpeedMax;
+        }
+        if( self.pressingDown ) {
+            self.y += self.moveSpeedMax;
+        }
+        if( self.pressingUp ) {
+            self.y -= self.moveSpeedMax;
+        }
+    }
+
+
     return self;
 }
 
@@ -44,6 +68,15 @@ io.sockets.on('connection', function(socket){
     // 플레이어 생성 > 등록
     var player = Player(socket.id);
     players[socket.id] = player;
+
+    socket.on('keyPress',function(data){
+        switch( data.inputId ) {
+        case 'left' : player.pressingLeft   = data.state; break;
+        case 'right': player.pressingRight  = data.state; break;
+        case 'up'   : player.pressingUp     = data.state; break;
+        case 'down' : player.pressingDown   = data.state; break;
+        }
+    });
 
     // 접속종료 처리
     socket.on('disconnect',function(){
@@ -60,8 +93,7 @@ setInterval( function(){
     // 모든 플레이어들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
     for( var playerId in players ) {
         var player = players[playerId];
-        player.x++;
-        player.y++;
+        player.updatePosition();
         pack.push({
             x:player.x,
             y:player.y,
