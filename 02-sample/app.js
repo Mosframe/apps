@@ -21,19 +21,31 @@ app.use('/client', express.static(__dirname + '/client/assets/'));
 server.listen(2000);
 console.log('server started');
 
+var sockets = {};
 
 // Socket.io를 통해 WebSocket 서비스를 시작한다.
 var io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log('socket connection');
 
-    // 클라이언트로 부터 데이터를 수신한다.
-    socket.on('message',function(data){
-        console.log('name ' + data.name );
-    });
-
-    // 클라이언트에 메시지를 보낸다.
-    socket.emit('serverMsg',{
-        msg:'hello'
-    });
+    // 소켓객체에 속성을 추가하고 소켓 리스테에 등록한다.
+    socket.id = Math.random();
+    socket.x = 0;
+    socket.y = 0;
+    sockets[socket.id] = socket;
 });
+
+// 서버 틱 업데이트 : 25fps
+setInterval( function(){
+
+    // 모든 접속자들에게 각자 변경된 위치정보들 보낸다.
+    for( var socketId in sockets ) {
+        var socket = sockets[socketId];
+        socket.x++;
+        socket.y++;
+        socket.emit('newPosition',{
+            x:socket.x,
+            y:socket.y
+        });
+    }
+},1000/25);

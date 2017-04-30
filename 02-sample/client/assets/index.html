@@ -1,27 +1,20 @@
-Hello world
-
 <meta charset="UTF-8">
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 <!-- https://cdnjs.com/ 에서 socket.io를 검색하여 원하는 버전을 사용한다.-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script>
-    // 서버에 접속한다.
-    var socket = io();
 
-    var random = Math.random();
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial';
 
-    // 서버에 메시지를 보낸다.
-    var sendMsg = function(){
-        socket.emit('message',{
-            name:'mosframe' + random
-        });
-    }
-    //sendMsg();
+// 서버에 접속한다.
+var socket = io();
 
-    // 서버로 부터 데이터를 수신한다.
-    socket.on('serverMsg',function(data){
-        console.log('msg ' + data.msg );
-    });
+// 서버로 부터 데이터를 수신한다.
+socket.on('newPosition',function(data){
+    ctx.clearRect(0,0,500,500);
+    ctx.fillStyle = 'green';
+    ctx.fillRect(data.x-10, data.y-10, 20, 20 );
+});
 
 </script>
-
-<button onclick="sendMsg()">SendMessage</button>
