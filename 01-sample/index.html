@@ -1,4 +1,4 @@
-<!-- DONE : 적군도 생명력을 같도록함 -->
+<!-- DONE : 스크롤에 의해 변화된 플레이어 탄환의 방향 보정 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -70,8 +70,9 @@ document.onmousemove = function( mouse ) {
     var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
     var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
 
-    mouseX -= player.x;
-    mouseY -= player.y;
+    mouseX -= WIDTH/2;
+    mouseY -= HEIGHT/2;
+
     player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
 }
 
