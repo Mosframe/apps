@@ -10,20 +10,29 @@ ctx.font = '20px Arial';
 // 서버에 접속한다.
 var socket = io();
 
+// -----------------------------------------------------------------------------
 // 서버로 부터 데이터를 수신한다.
 socket.on('newPositions',function(data){
     ctx.clearRect(0,0,500,500);
+
+    ctx.save();
     ctx.fillStyle = 'green';
-    for( var c=0; c<data.length; ++c ) {
-        ctx.fillRect(data[c].x-10, data[c].y-10, 20, 20 );
+    for( var c=0; c<data.player.length; ++c ) {
+        ctx.fillRect(data.player[c].x-10, data.player[c].y-10, 20, 20 );
     }
     ctx.fillStyle = 'yellow';
-    for( var c=0; c<data.length; ++c ) {
-        ctx.fillText(data[c].name,data[c].x-5,data[c].y+7);
+    for( var c=0; c<data.player.length; ++c ) {
+        ctx.fillText(data.player[c].name,data.player[c].x-5,data.player[c].y+7);
     }
+    ctx.fillStyle = 'red';
+    for( var c=0; c<data.bullet.length; ++c ) {
+        ctx.fillRect(data.bullet[c].x-5, data.bullet[c].y-5, 10, 10 );
+    }
+    ctx.restore();
 });
 
 
+// -----------------------------------------------------------------------------
 // 키보드 키 다운 이벤트
 document.onkeydown = function( event ) {
     //console.log(evnet.keyCode);
@@ -39,6 +48,7 @@ document.onkeydown = function( event ) {
     }
 }
 
+// -----------------------------------------------------------------------------
 // 키보드 키 업 이벤트
 document.onkeyup = function( event ) {
     if( event.keyCode === 68 ) {        // d
