@@ -1,4 +1,4 @@
-<!-- 일정시간마다 무작위 방향으로 플레이어 탄환 발사  -->
+<!-- 탄환과 충돌한 적군 죽이기  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -221,6 +221,14 @@ update = function () {
     // 탄환 갱신
     for( var key in bullets ) {
         updateEntity(bullets[key]);
+        for( var key2 in enemies ) {
+            var isColliding = testCollisionEntity( bullets[key], enemies[key2] );
+            if( isColliding ) {
+                delete bullets[key];
+                delete enemies[key2];
+                break;
+            }
+        }
     }
 
     // 강화 아이템 갱신
