@@ -1,4 +1,4 @@
-<!-- 탄환과 충돌한 적군 죽이기  -->
+<!-- 탄환에 생명력을 추가하여 일정시간이 지나면 자동 파괴한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -129,6 +129,8 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
         width   : width,
         height  : height,
         color   : 'black',
+        //
+        lifeTime : 100,
     };
     bullets[id] = bullet;
 }
@@ -221,13 +223,27 @@ update = function () {
     // 탄환 갱신
     for( var key in bullets ) {
         updateEntity(bullets[key]);
+
+        var toRemove = false;
+
+        // 생명력 처리
+        bullets[key].lifeTime--;
+        if( bullets[key].lifeTime <= 0 ) {
+            toRemove = true;
+        }
+
+        // 적군과 충돌 처리
         for( var key2 in enemies ) {
             var isColliding = testCollisionEntity( bullets[key], enemies[key2] );
             if( isColliding ) {
-                delete bullets[key];
+                toRemove = true;
                 delete enemies[key2];
                 break;
             }
+        }
+
+        if( toRemove ) {
+            delete bullets[key];
         }
     }
 
