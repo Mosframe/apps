@@ -85,6 +85,22 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
             self.onDeath();
         }
     }
+    // 그리기
+    self.draw = function() {
+        ctx.save();
+
+        // 플레이어와 떨어진 거리만큼 위치시킨다.
+        var x = self.x - player.x;
+        var y = self.y - player.y;
+        x += WIDTH/2;
+        y += HEIGHT/2;
+        x -= self.width/2;
+        y -= self.height/2;
+
+        // 스프라이트에서 정면 이미지 그리기
+        ctx.drawImage(self.image,0,self.image.height/2,self.image.width/3,self.image.height/4,x,y,width,height);
+        ctx.restore();
+    }
     // 죽음
     self.onDeath = function() {}
     // 공격 수행
