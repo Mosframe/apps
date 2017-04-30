@@ -1,4 +1,4 @@
-<!-- 적들의 외형을 다르게 설정해 본다.  -->
+<!-- 플레이어가 화면을 벋어나지 않도록 한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -21,7 +21,7 @@ var player = {
     name    : 'P',
     hp      : 10,
     width   : 20,
-    height  : 20,
+    height  : 40,
     color   : 'green',
 }
 
@@ -68,8 +68,17 @@ Enemy = function ( id, x, y, speedX, speedY, width, height ) {
 }
 
 document.onmousemove = function( mouse ) {
-    var mouseX = mouse.clientX;
-    var mouseY = mouse.clientY;
+    var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
+    var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
+
+    if( mouseX < player.width/2 )
+        mouseX = player.width/2;
+    if( mouseX > WIDTH-player.width/2 )
+        mouseX = WIDTH-player.width/2;
+    if( mouseY < player.height/2 )
+        mouseY = player.height/2;
+    if( mouseY > HEIGHT-player.height/2 )
+        mouseY = HEIGHT-player.height/2;
 
     player.x = mouseX;
     player.y = mouseY;
