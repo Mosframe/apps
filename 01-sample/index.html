@@ -1,4 +1,4 @@
-<!-- update의 중복된 비교문을 간략화 시킨다. -->
+<!-- 적(E)를 추가한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -6,20 +6,29 @@
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
 
-var x       = 100;
-var y       = 100;
+// player
+var x       = 50;
+var y       = 40;
 var speedX  = 30;
 var speedY  = 5;
-var name    = 'P';
+var name    = 'P'
+
+// enemy
+var enemy_x       = 150;
+var enemy_y       = 350;
+var enemy_speedX  = 10;
+var enemy_speedY  = 15;
+var enemy_name    = 'E'
 
 // 변수화
-var WIDTH   = 500;
-var HEIGHT  = 500;
-var message = '바운드됨';
+var WIDTH    = 500;
+var HEIGHT   = 500;
+var message  = '바운드됨';
 
 setInterval( update, 40 );
 
 function update() {
+    // player
     x += speedX;
     y += speedY;
     ctx.fillText(name, x, y);
@@ -32,6 +41,20 @@ function update() {
     if( y < 0 || y > HEIGHT ) {
         console.log( message );
         speedY = -speedY;
+    }
+
+    // enemy
+    enemy_x += enemy_speedX;
+    enemy_y += enemy_speedY;
+    ctx.fillText(enemy_name, enemy_x, enemy_y);
+
+    if( enemy_x < 0 || enemy_x > WIDTH ) {
+        console.log( message );
+        enemy_speedX = -enemy_speedX;
+    }
+    if( enemy_y < 0 || enemy_y > HEIGHT ) {
+        console.log( message );
+        enemy_speedY = -enemy_speedY;
     }
 }
 </script>
