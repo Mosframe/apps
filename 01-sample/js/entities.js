@@ -44,7 +44,7 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,image) {
         ctx.save();
         var x = self.x-self.width/2;
         var y = self.y-self.height/2;
-        ctx.drawImage(self.image,x,y);
+        ctx.drawImage(self.image,0,0,self.image.width,self.image.height,x,y,width,height);
         ctx.restore();
     }
     // 두 물체 사이의 거리값을 구한다.
@@ -122,7 +122,7 @@ Actor = function( type, id, x, y, speedX, speedY, width, height, image, hp, atta
 // -----------------------------------------------------------------------------
 // 플레이어
 Player = function(){
-    var self = Actor( 'player','myId', 50, 40, 30, 5, 20, 20, images.player, 10, 1 );
+    var self = Actor( 'player','myId', 50, 40, 30, 5, 50, 70, images.player, 10, 1 );
 
     self.pressingDown    = false;
     self.pressingUp      = false;
@@ -187,16 +187,16 @@ Enemy = function ( id, x, y, speedX, speedY, width, height ) {
     }
 
     enemies[id] = self;
-    }
-    // 무작위로 적군 생성
-    randomlyGenerateEnemy = function() {
+}
+// 무작위로 적군 생성
+randomlyGenerateEnemy = function() {
     var id      = Math.random();
     var x       = Math.random() * WIDTH;
     var y       = Math.random() * HEIGHT;
     var speedX  =  5 + Math.random() *  5; //  5 ~ 10
     var speedY  =  5 + Math.random() *  5; //  5 ~ 10
-    var width   = 10 + Math.random() * 30; // 10 ~ 40
-    var height  = 10 + Math.random() * 30; // 10 ~ 40
+    var width   = 64;
+    var height  = 64;
     Enemy( id, x, y, speedX, speedY, width, height );
 }
 
@@ -231,8 +231,8 @@ randomlyGenerateUpgrade = function() {
     var y       = Math.random() * HEIGHT;
     var speedX  =  0;
     var speedY  =  0;
-    var width   = 10;
-    var height  = 10;
+    var width   = 32;
+    var height  = 32;
 
     if( Math.random()<0.5) {
         var category    = 'score';
@@ -293,7 +293,7 @@ generateBullet = function( actor, overwriteAngle ) {
     }
     var speedX  = Math.cos(angle/180*Math.PI)*5;
     var speedY  = Math.sin(angle/180*Math.PI)*5;
-    var width   = 10;
-    var height  = 10;
+    var width   = 32;
+    var height  = 32;
     Bullet( id, x, y, speedX, speedY, width, height );
 }
