@@ -1,4 +1,4 @@
-<!-- 강화 아이템 획득하면 점수를 추가 획득한다.  -->
+<!-- 일정시간마다 무작위 방향으로 플레이어 탄환 발사  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -30,11 +30,12 @@ var player = {
     color   : 'green',
 }
 
-// enemy
+// 적군들
 var enemies = {};
-
 // 강화 아이템들
 var upgrades = {};
+// 탄환들
+var bullets = {};
 
 // 두 물체 사이의 거리값을 구한다.
 getDistanceBetweenEntity = function ( entity1, entity2 ) {
@@ -88,7 +89,7 @@ randomlyGenerateEnemy = function() {
     Enemy( id, x, y, speedX, speedY, width, height );
 }
 
-// 강화 아이템 생성
+// 강화 아이템 생성 함수
 Upgrade = function ( id, x, y, speedX, speedY, width, height ) {
     var upgrade = {
         id      : id,
@@ -114,6 +115,35 @@ randomlyGenerateUpgrade = function() {
     var width   = 10;
     var height  = 10;
     Upgrade( id, x, y, speedX, speedY, width, height );
+}
+
+// 탄환 생성 함수
+Bullet = function ( id, x, y, speedX, speedY, width, height ) {
+    var bullet = {
+        id      : id,
+        x       : x,
+        y       : y,
+        speedX  : speedX,
+        speedY  : speedY,
+        name    : 'Bullet',
+        width   : width,
+        height  : height,
+        color   : 'black',
+    };
+    bullets[id] = bullet;
+}
+
+// 무작위로 탄환 생성
+randomlyGenerateBullet = function() {
+    var id      = Math.random();
+    var x       = player.x;
+    var y       = player.y;
+    var angle   = Math.random() * 360;
+    var speedX  = Math.cos(angle/180*Math.PI)*5;
+    var speedY  = Math.sin(angle/180*Math.PI)*5;
+    var width   = 10;
+    var height  = 10;
+    Bullet( id, x, y, speedX, speedY, width, height );
 }
 
 // 마우스 이동 이벤트 처리
@@ -181,8 +211,17 @@ update = function () {
         randomlyGenerateEnemy();
 
     // 강화 아이템 생성
-    if( frameCount % 75 === 0 )
+    if( frameCount % 75 === 0 ) // 3초 마다
         randomlyGenerateUpgrade();
+
+    // 탄환 생성
+    if( frameCount % 25 === 0 ) // 1초 마다
+        randomlyGenerateBullet();
+
+    // 탄환 갱신
+    for( var key in bullets ) {
+        updateEntity(bullets[key]);
+    }
 
     // 강화 아이템 갱신
     for( var key in upgrades ) {
@@ -223,6 +262,7 @@ startNewGame = function() {
     score               = 0;
     enemies             = {};
     upgrades            = {};
+    bullets             = {};
     timeWhenGameStarted = Date.now();
 
     randomlyGenerateEnemy();
