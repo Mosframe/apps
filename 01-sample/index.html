@@ -1,8 +1,9 @@
-<!-- 점수획득량이 다른 강화 아이템을 2종류 제작한다.  -->
+<!-- 플레이어 공격속도 속성 추가  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
+
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -19,15 +20,16 @@ var score = 0;
 
 // player
 var player = {
-    x       : 50,
-    y       : 40,
-    speedX  : 30,
-    speedY  : 5,
-    name    : 'Player',
-    hp      : 10,
-    width   : 20,
-    height  : 40,
-    color   : 'green',
+    x           : 50,
+    y           : 40,
+    speedX      : 30,
+    speedY      : 5,
+    name        : 'Player',
+    hp          : 10,
+    width       : 20,
+    height      : 40,
+    color       : 'green',
+    attackSpeed : 5, // 공격속도 (초당 발사량)
 }
 
 // 적군들
@@ -227,7 +229,7 @@ update = function () {
         randomlyGenerateUpgrade();
 
     // 탄환 생성
-    if( frameCount % 25 === 0 ) // 1초 마다
+    if( frameCount % Math.round(25/player.attackSpeed) === 0 ) // 플레이어 공격속도에 따라서
         randomlyGenerateBullet();
 
     // 탄환 갱신
