@@ -1,4 +1,4 @@
-<!-- Entity update함수 정리 -->
+<!-- Entity 멤버함수들 정리 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -31,57 +31,58 @@ Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
     }
     // 엔티티 갱신
     self.update = function () {
-        updateEntityPosition( self );
-        drawEntity( self );
+        self.updatePosition();
+        self.draw();
     }
+    // 엔티티 위치 갱신
+    self.updatePosition = function() {
+        if( self.type === 'player' ) {
+            if( self.pressingRight ) {
+                self.x += 10;
+            }
+            if( self.pressingLeft ) {
+                self.x -= 10;
+            }
+            if( self.pressingDown ) {
+                self.y += 10;
+            }
+            if( self.pressingUp ) {
+                self.y -= 10;
+            }
+
+            // 이동제한
+            if( self.x < self.width/2 )
+                self.x = self.width/2;
+            if( self.x > WIDTH-self.width/2 )
+                self.x = WIDTH-self.width/2;
+            if( self.y < self.height/2 )
+                self.y = self.height/2;
+            if( self.y > HEIGHT-self.height/2 )
+                self.y = HEIGHT-self.height/2;
+
+        } else {
+            self.x += self.speedX;
+            self.y += self.speedY;
+
+            if( self.x < 0 || self.x > WIDTH ) {
+                self.speedX = -self.speedX;
+            }
+            if( self.y < 0 || self.y > HEIGHT ) {
+                self.speedY = -self.speedY;
+            }
+        }
+    }
+    // 엔티티 그리기
+    self.draw = function() {
+        ctx.save();
+        ctx.fillStyle = self.color;
+        ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        ctx.restore();
+    }
+
     return self;
 }
 
-// 엔티티 위치 갱신
-updateEntityPosition = function( entity ) {
-    if( entity.type === 'player' ) {
-        if( entity.pressingRight ) {
-            entity.x += 10;
-        }
-        if( entity.pressingLeft ) {
-            entity.x -= 10;
-        }
-        if( entity.pressingDown ) {
-            entity.y += 10;
-        }
-        if( entity.pressingUp ) {
-            entity.y -= 10;
-        }
-
-        // 이동제한
-        if( entity.x < entity.width/2 )
-            entity.x = entity.width/2;
-        if( entity.x > WIDTH-entity.width/2 )
-            entity.x = WIDTH-entity.width/2;
-        if( entity.y < entity.height/2 )
-            entity.y = entity.height/2;
-        if( entity.y > HEIGHT-entity.height/2 )
-            entity.y = HEIGHT-entity.height/2;
-
-    } else {
-        entity.x += entity.speedX;
-        entity.y += entity.speedY;
-
-        if( entity.x < 0 || entity.x > WIDTH ) {
-            entity.speedX = -entity.speedX;
-        }
-        if( entity.y < 0 || entity.y > HEIGHT ) {
-            entity.speedY = -entity.speedY;
-        }
-    }
-}
-// 엔티티 그리기
-drawEntity = function( entity ) {
-    ctx.save();
-    ctx.fillStyle = entity.color;
-    ctx.fillRect(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height );
-    ctx.restore();
-}
 
 // 플레이어 생성
 createPlayer = function(){
@@ -102,34 +103,6 @@ createPlayer = function(){
 
 // 적군들
 var enemies = {};
-// 강화 아이템들
-var upgrades = {};
-// 탄환들
-var bullets = {};
-
-// 두 물체 사이의 거리값을 구한다.
-getDistanceBetweenEntity = function ( entity1, entity2 ) {
-    var vx = entity1.x - entity2.x;
-    var vy = entity1.y - entity2.y;
-    return Math.sqrt( vx*vx + vy*vy );
-}
-
-// 두 물체가 충돌했는지 알아낸다.
-testCollisionEntity = function ( entity1, entity2 ) {
-    var rect1 = {
-        x:entity1.x-entity1.width/2,
-        y:entity1.y-entity1.height/2,
-        width:entity1.width,
-        height:entity1.height,
-    }
-    var rect2 = {
-        x:entity2.x-entity2.width/2,
-        y:entity2.y-entity2.height/2,
-        width:entity2.width,
-        height:entity2.height,
-    }
-    return testCollisionRectRect( rect1, rect2 );
-}
 
 // 적군 생성 함수
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
@@ -154,6 +127,9 @@ randomlyGenerateEnemy = function() {
     var height  = 10 + Math.random() * 30; // 10 ~ 40
     Enemy( id, x, y, speedX, speedY, width, height );
 }
+
+// 강화 아이템들
+var upgrades = {};
 
 // 강화 아이템 생성 함수
 Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
@@ -184,6 +160,9 @@ randomlyGenerateUpgrade = function() {
     Upgrade( id, x, y, speedX, speedY, width, height, category, color );
 }
 
+// 탄환들
+var bullets = {};
+
 // 탄환 생성 함수
 Bullet = function ( id, x, y, speedX, speedY, width, height ) {
     var self = Entity('bullet',id,x,y,speedX,speedY,width,height,'black');
@@ -206,6 +185,30 @@ generateBullet = function( actor, overwriteAngle ) {
     var width   = 10;
     var height  = 10;
     Bullet( id, x, y, speedX, speedY, width, height );
+}
+
+// 두 물체 사이의 거리값을 구한다.
+getDistanceBetweenEntity = function ( entity1, entity2 ) {
+    var vx = entity1.x - entity2.x;
+    var vy = entity1.y - entity2.y;
+    return Math.sqrt( vx*vx + vy*vy );
+}
+
+// 두 물체가 충돌했는지 알아낸다.
+testCollisionEntity = function ( entity1, entity2 ) {
+    var rect1 = {
+        x:entity1.x-entity1.width/2,
+        y:entity1.y-entity1.height/2,
+        width:entity1.width,
+        height:entity1.height,
+    }
+    var rect2 = {
+        x:entity2.x-entity2.width/2,
+        y:entity2.y-entity2.height/2,
+        width:entity2.width,
+        height:entity2.height,
+    }
+    return testCollisionRectRect( rect1, rect2 );
 }
 
 // 박스와 박스 충돌 테스트
