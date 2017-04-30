@@ -157,6 +157,11 @@ Player = function(){
 
     // 위치 갱신
     self.updatePosition = function() {
+
+        var oldX = self.x;
+        var oldY = self.y;
+
+        // 이동
         if( self.pressingRight ) {
             self.x += 10;
         }
@@ -179,6 +184,12 @@ Player = function(){
             self.y = self.height/2;
         if( self.y > Maps.current.height-self.height/2 )
             self.y = Maps.current.height-self.height/2;
+
+        // 맵 오브젝트에 충돌처리
+        if( Maps.current.isPositionWall(self) ) {
+            self.x = oldX;
+            self.y = oldY;
+        }
     }
     // 갱신
     var super_update = self.update;
@@ -266,6 +277,9 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
     // 위치 갱신
     self.updatePosition = function() {
 
+        var oldX = self.x;
+        var oldY = self.y;
+
         // 플레이어를 따라다닌다.
         var diffX = player.x - self.x;
         var diffY = player.y - self.y;
@@ -281,6 +295,13 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
         } else {
             self.y -= 3;
         }
+
+        // 맵 오브젝트에 충돌처리
+        if( Maps.current.isPositionWall(self) ) {
+            self.x = oldX;
+            self.y = oldY;
+        }
+
     }
 }
 Enemy.list = {};
