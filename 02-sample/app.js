@@ -27,8 +27,8 @@ var io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log('socket connection');
 
-    // 클라이언트로 부터 메시지를 수신한다.
-    socket.on('message',function(){
-        console.log('message');
+    // 클라이언트로 부터 데이터를 수신한다.
+    socket.on('message',function(data){
+        console.log('name ' + data.name );
     });
 });
