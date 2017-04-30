@@ -1,4 +1,4 @@
-<!-- 캔버스의 x축 좌표를 이동하면서 P자를 출력해 본다. -->
+<!-- 플레이어(P)를 캔버스에 일정속도값을 사용하여 이동시켜 출려해 본다. -->
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
@@ -7,16 +7,19 @@
 
     var x = 100;
     var y = 100;
+    var speedX = 50;
+    var speedY = 5;
 
-    x = 100;
+    x += speedX;
+    y += speedY;
     ctx.fillText('P', x, y);
 
-    x = 100+100;
+    x += speedX;
+    y += speedY;
     ctx.fillText('P', x, y);
 
-    x = x + 100;
+    x += speedX;
+    y += speedY;
     ctx.fillText('P', x, y);
 
-    x += 100;
-    ctx.fillText('P', x, y);
 </script>
