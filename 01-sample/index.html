@@ -1,4 +1,4 @@
-<!-- 키보드로 플레이어 이동 컨트롤 하기  -->
+<!-- 탄환을 마우스커서가 있는 방향으로 발사  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -35,6 +35,8 @@ var player = {
     pressingUp      : false,
     pressingLeft    : false,
     pressingRight   : false,
+
+    aimAngle        : 0, //사격 각도
 }
 
 // 적군들
@@ -152,12 +154,12 @@ Bullet = function ( id, x, y, speedX, speedY, width, height ) {
     bullets[id] = bullet;
 }
 
-// 무작위로 탄환 생성
-randomlyGenerateBullet = function() {
+// 탄환 생성
+generateBullet = function() {
     var id      = Math.random();
     var x       = player.x;
     var y       = player.y;
-    var angle   = Math.random() * 360;
+    var angle   = player.aimAngle;
     var speedX  = Math.cos(angle/180*Math.PI)*5;
     var speedY  = Math.sin(angle/180*Math.PI)*5;
     var width   = 10;
@@ -202,30 +204,19 @@ drawEntity = function( something ) {
 
 // 마우스 이동 이벤트 처리
 document.onmousemove = function( mouse ) {
-    /*
-    // 마우스로 플레이어 이동 컨트롤
     var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
     var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
 
-    if( mouseX < player.width/2 )
-        mouseX = player.width/2;
-    if( mouseX > WIDTH-player.width/2 )
-        mouseX = WIDTH-player.width/2;
-    if( mouseY < player.height/2 )
-        mouseY = player.height/2;
-    if( mouseY > HEIGHT-player.height/2 )
-        mouseY = HEIGHT-player.height/2;
-
-    player.x = mouseX;
-    player.y = mouseY;
-    */
+    mouseX -= player.x;
+    mouseY -= player.y;
+    player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
 }
 
 // 마우스 클릭
 document.onclick = function( mouse ) {
     // 탄환 생성
     if( player.attackCounter > 25 ) {
-        randomlyGenerateBullet();
+        generateBullet();
         player.attackCounter = 0;
     }
 }
