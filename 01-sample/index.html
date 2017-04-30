@@ -1,16 +1,22 @@
-<!-- 폰트변경 + 사각형그리기 -->
+<!-- 캔버스의 x축 좌표를 이동하면서 P자를 출력해 본다. -->
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
     var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.font = '30px Arial';
 
-    // 1. 설정 변경
-    ctx.font = '30px Arial';    // 폰트 설정
-    ctx.fillStyle = 'red';      // 칼라 설정
-    ctx.globalAlpha = 0.5;      // 투명도 설정 (0~1)
+    var x = 100;
+    var y = 100;
 
-    // 2. 그리기
-    ctx.fillText('Hello World', 100, 100);  // 텍스트 그리기
-    ctx.fillRect(100,100,100,100);          // 사각형 그리기
-    ctx.clearRect(130,75,30,100);           // 사각형 지우기
+    x = 100;
+    ctx.fillText('P', x, y);
+
+    x = 100+100;
+    ctx.fillText('P', x, y);
+
+    x = x + 100;
+    ctx.fillText('P', x, y);
+
+    x += 100;
+    ctx.fillText('P', x, y);
 </script>
