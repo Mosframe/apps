@@ -1,4 +1,4 @@
-<!-- DONE : 적들도 HP를 갖도록 수정 -->
+<!-- DONE : 적군 2종류로 확장 : 박쥐=(공격속도가 느리고 생명력이 강함), 벌=(공격속도가 빠르고 생명력이 약함) -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -24,8 +24,10 @@ var paused      = false;
 var images = {};
 images.player   = new Image();
 images.player.src   = "images/player.png";
-images.enemy    = new Image();
-images.enemy.src    = "images/enemy.png";
+images.bat      = new Image();
+images.bat.src      = "images/bat.png";
+images.bee      = new Image();
+images.bee.src      = "images/bee.png";
 images.bullet   = new Image();
 images.bullet.src   = "images/bullet.png";
 images.upgrade1 = new Image();

@@ -239,7 +239,11 @@ randomlyGenerateEnemy = function() {
     var y       = Math.random() * currentMap.height;
     var width   = 64;
     var height  = 64;
-    Enemy( id, x, y, width, height, images.enemy, 10, 1 );
+    if( Math.random() < 0.5 ) {
+        Enemy( id, x, y, width, height, images.bat, 2, 1 );
+    } else {
+        Enemy( id, x, y, width, height, images.bee, 1, 3 );
+    }
 }
 
 // -----------------------------------------------------------------------------
