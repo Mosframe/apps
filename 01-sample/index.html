@@ -1,4 +1,4 @@
-<!-- DONE : 플레이어 중심으로 맵과 엔티티들 스크롤하기 -->
+<!-- DONE : 맵을 오브젝트화 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -30,8 +30,28 @@ images.upgrade1 = new Image();
 images.upgrade1.src = "images/upgrade1.png";
 images.upgrade2 = new Image();
 images.upgrade2.src = "images/upgrade2.png";
-images.map      = new Image();
-images.map.src      = "images/map.png";
+
+// -----------------------------------------------------------------------------
+// 맵
+Maps = function(id,imageSrc,width,height) {
+    var self = {
+        id:id,
+        image:new Image(),
+        width:width,
+        height:height,
+    }
+    self.image.src = imageSrc;
+
+    // 그리기
+    self.draw = function() {
+        x = WIDTH/2 - player.x;
+        y = HEIGHT/2 - player.y;
+
+        ctx.drawImage( self.image, 0, 0, self.image.width, self.image.height, x, y, self.image.width*2, self.image.height*2 );
+    }
+    return self;
+}
+currentMap = Maps('field', 'images/map.png', 1280, 960);
 
 // -----------------------------------------------------------------------------
 // 유틸리티
@@ -102,7 +122,7 @@ document.onkeyup = function( event ) {
 update = function () {
     ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
 
-    drawMap(); // 맵 그리기
+    currentMap.draw(); // 맵 그리기
 
     ++frameCount;
     ++score;
@@ -163,12 +183,5 @@ startNewGame();
 setInterval( update, 40 ); // 1000/40=25fps
 
 
-// -----------------------------------------------------------------------------
-// 맵
-drawMap = function() {
-    x = WIDTH/2 - player.x;
-    y = HEIGHT/2 - player.y;
 
-    ctx.drawImage( images.map, 0, 0, images.map.width, images.map.height, x, y, images.map.width*2, images.map.height*2 );
-}
 </script>
