@@ -69,17 +69,19 @@ Entity = function(type,id,x,y,width,height,image) {
 Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     var self = Entity( type, id, x, y, width, height, image );
 
-    self.hp             = hp            ;
-    self.hpMax          = hp            ;
-    self.attackSpeed    = attackSpeed   ; // 공격속도 (초당 발사량)
-    self.attackCounter  =  0            ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-    self.aimAngle       =  0            ; // 공격방향(각도)
+    self.hp                 = hp            ;
+    self.hpMax              = hp            ;
+    self.attackSpeed        = attackSpeed   ; // 공격속도 (초당 발사량)
+    self.attackCounter      = 0             ; // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+    self.aimAngle           = 0             ; // 공격방향(각도)
+    self.spriteAnimCounter  = 0             ; // 스프라이트 에니메이션 카운터
 
     // 갱신
     var super_update = self.update;
     self.update = function() {
         super_update();
-        self.attackCounter += self.attackSpeed;
+        self.attackCounter      += self.attackSpeed;
+        self.spriteAnimCounter  += 0.2;
 
         if( self.hp <= 0 ) {
             self.onDeath();
@@ -110,10 +112,13 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         else if(aimAngle >= 225 && aimAngle < 315 ) // up
             directionMod = 0;
 
+        // 이동 에니메이션 루핑 처리
+        var walkingMod = Math.floor(self.spriteAnimCounter) % 3;
+
         // 스프라이트에서 정면 이미지 그리기
         var frameWidth  = self.image.width/3;
         var frameHeight = self.image.height/4;
-        ctx.drawImage(self.image,0,directionMod*frameHeight,frameWidth,frameHeight,x,y,width,height);
+        ctx.drawImage(self.image,walkingMod*frameWidth,directionMod*frameHeight,frameWidth,frameHeight,x,y,width,height);
         ctx.restore();
     }
     // 죽음
