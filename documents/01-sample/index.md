@@ -6,4 +6,5 @@
 ---
 
 001. [Cavas 구조 이해하기](images/01.jpg)
-002. [500 x 500 크기의 캔버스를 생성한다](../../01-sample/index.html)
+002. 500 x 500 크기의 캔버스를 생성한다.
+003. [캔버스 중앙에 Hello World를 출력한다.](../../01-sample/index.html)

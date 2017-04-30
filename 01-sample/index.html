@@ -1,2 +1,8 @@
 <!-- 500 x 500 크기의 캔버스를 생성한다.-->
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+
+<!-- 캔버스 중앙에 Hello World를 출력한다.-->
+<script>
+    var ctx = document.getElementById("ctx").getContext("2d");
+    ctx.fillText('Hello World',200,200);
+</script>
