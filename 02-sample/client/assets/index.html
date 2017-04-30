@@ -5,8 +5,18 @@ Hello world
 <script>
     // 서버에 접속한다.
     var socket = io();
-    // 서버에 메시지를 보낸다.
-    socket.emit('message',{
-        name:'mosframe'
+
+    var msg = function(){
+        // 서버에 메시지를 보낸다.
+        socket.emit('message',{
+            name:'mosframe'
+        });
+    }
+    msg();
+
+    // 서버로 부터 데이터를 수신한다.
+    socket.on('serverMsg',function(data){
+        console.log('msg ' + data.msg );
     });
+
 </script>

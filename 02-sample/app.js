@@ -31,4 +31,9 @@ io.sockets.on('connection', function(socket){
     socket.on('message',function(data){
         console.log('name ' + data.name );
     });
+
+    // 클라이언트에 메시지를 보낸다.
+    socket.emit('serverMsg',{
+        msg:'hello'
+    });
 });
