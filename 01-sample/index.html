@@ -1,4 +1,4 @@
-<!-- 플레이어의 생명력을 추가하고 적들과 충돌했을때 1씩 감소시키고 생명력이 0이되면 부활시킨다.  -->
+<!-- 플레이 타임을 기록한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -10,6 +10,7 @@ ctx.font = '30px Arial';
 // 변수화
 var WIDTH    = 500;
 var HEIGHT   = 500;
+var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
 
 // player
 var player = {
@@ -91,7 +92,10 @@ update = function () {
             console.log('colliding!');
             player.hp = player.hp - 1;
             if( player.hp <= 0 ) {
-                console.log("You Lost!");
+                var timeSurvived = Date.now() - timeWhenGameStarted;
+                console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
+
+                timeWhenGameStarted = Date.now();
                 player.hp = 10;
             }
         }
