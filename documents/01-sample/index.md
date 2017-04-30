@@ -65,5 +65,6 @@
 053. 충돌 체크함수도 Entity 멤버함수로 정리
 054. Entity > Actor > (Player,Enemy) 으로 상속되도록 처리함
 055. update함수를 오버라이딩을 이용하여 개선
+056. entities를 별도의 소스 파일로 분리시킴
 
 [index.html](../../01-sample/index.html)
