@@ -1,5 +1,5 @@
-<!-- 적들을 그룹화 시킨다.  -->
-<meta charset="UTF-8">
+<!-- 적들을 더 추가하고 반복문을 이용하여 갱신시킨다.  -->
+<<meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
@@ -21,6 +21,8 @@ var player = {
 }
 
 // enemy
+var enemies = {};
+
 var enemy1 = {
     x       : 150,
     y       : 350,
@@ -29,6 +31,7 @@ var enemy1 = {
     name    : 'E',
     id      : 'E1',
 };
+enemies['E1'] = enemy1;
 
 var enemy2 = {
     x       : 100,
@@ -38,10 +41,17 @@ var enemy2 = {
     name    : 'E',
     id      : 'E2',
 };
-
-var enemies = {};
-enemies['E1'] = enemy1;
 enemies['E2'] = enemy2;
+
+var enemy3 = {
+    x       : 11,
+    y       : 350,
+    speedX  : 10,
+    speedY  : 5,
+    name    : 'E',
+    id      : 'E3',
+};
+enemies['E3'] = enemy3;
 
 
 setInterval( update, 40 );
@@ -65,8 +75,11 @@ function updateEntity( something ) {
 // update
 function update() {
     ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
-    updateEntity(enemies['E1']);
-    updateEntity(enemies['E2']);
+
+    for( var key in enemies ) {
+        updateEntity(enemies[key]);
+    }
+
     updateEntity(player);
 }
 
