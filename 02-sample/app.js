@@ -1,4 +1,4 @@
-// DONE : WebSocket 서비스 시작
+// app : 서비스 시작
 
 // express 생성
 var express = require('express');
@@ -26,4 +26,9 @@ console.log('server started');
 var io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log('socket connection');
+
+    // 클라이언트로 부터 메시지를 수신한다.
+    socket.on('message',function(){
+        console.log('message');
+    });
 });
