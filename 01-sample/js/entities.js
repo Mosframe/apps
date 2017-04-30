@@ -80,9 +80,7 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     var super_update = self.update;
     self.update = function() {
         super_update();
-        self.attackCounter      += self.attackSpeed;
-        self.spriteAnimCounter  += 0.2;
-
+        self.attackCounter += self.attackSpeed;
         if( self.hp <= 0 ) {
             self.onDeath();
         }
@@ -187,6 +185,11 @@ Player = function(){
     self.update = function() {
         super_update();
 
+        // 이동 에니메이션
+        if( self.pressingRight || self.pressingLeft || self.pressingDown || self.pressingUp ) {
+            self.spriteAnimCounter  += 0.2;
+        }
+
         if( self.pressingMouseLeft ) {
             self.performAttack();
         }
@@ -225,6 +228,7 @@ Enemy = function ( id, x, y, width, height, image, hp, attackSpeed ) {
     var super_update = self.update;
     self.update = function() {
         super_update();
+        self.spriteAnimCounter  += 0.2;
         self.performAttack();
         self.updateAim();
     }
