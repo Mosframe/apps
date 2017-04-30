@@ -1,4 +1,4 @@
-<!-- 플레이어와 적을 오브젝트화 시킨다.  -->
+<!-- 플레이어와 적의 갱신을 함수로 구현한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -31,9 +31,8 @@ var enemy = {
 
 setInterval( update, 40 );
 
-function update() {
-
-    // player
+// update player
+function updatePlayer() {
     player.x += player.speedX;
     player.y += player.speedY;
     ctx.fillText(player.name, player.x, player.y);
@@ -46,8 +45,10 @@ function update() {
         console.log( message );
         player.speedY = -player.speedY;
     }
+}
 
-    // enemy
+// update enemy
+function updateEnemy() {
     enemy.x += enemy.speedX;
     enemy.y += enemy.speedY;
     ctx.fillText(enemy.name, enemy.x, enemy.y);
@@ -60,6 +61,12 @@ function update() {
         console.log( message );
         enemy.speedY = -enemy.speedY;
     }
+}
+
+// update
+function update() {
+    updatePlayer();
+    updateEnemy();
 }
 
 </script>
