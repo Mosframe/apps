@@ -1,4 +1,5 @@
-<!-- 반복실행함수로 플레이어를 연속적으로 이동시켜본다. -->
+<!-- 플레이어가 캔버스 영역을 벋어났을때 콘솔메시지를 출력해 본다. -->
+<meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
@@ -10,13 +11,17 @@
     var speedX  = 50;
     var speedY  = 5;
 
-    setInterval( update, 500); // 함수를 반복 실행한다.
+    setInterval( update, 500);
 
     function update() {
         x += speedX;
         y += speedY;
         ctx.fillText('P', x, y);
-        console.log('x', x,'y',y); // 콘솔창에 출력
+        console.log('x', x,'y',y);
+
+        if( x > 500 ) {
+            console.log( '캔버스 영역을 벋어남!');
+        }
     }
 
 </script>
