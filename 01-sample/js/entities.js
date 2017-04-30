@@ -153,7 +153,7 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
 // -----------------------------------------------------------------------------
 // 플레이어
 Player = function(){
-    var self = Actor( 'player','myId', 50, 40, 50, 70, images.player, 10, 1 );
+    var self = Actor( 'player','myId', 50, 40, 50*1.5, 70*1.5, images.player, 10, 1 );
 
     // 위치 갱신
     self.updatePosition = function() {
@@ -173,12 +173,12 @@ Player = function(){
         // 이동제한
         if( self.x < self.width/2 )
             self.x = self.width/2;
-        if( self.x > currentMap.width-self.width/2 )
-            self.x = currentMap.width-self.width/2;
+        if( self.x > Maps.current.width-self.width/2 )
+            self.x = Maps.current.width-self.width/2;
         if( self.y < self.height/2 )
             self.y = self.height/2;
-        if( self.y > currentMap.height-self.height/2 )
-            self.y = currentMap.height-self.height/2;
+        if( self.y > Maps.current.height-self.height/2 )
+            self.y = Maps.current.height-self.height/2;
     }
     // 갱신
     var super_update = self.update;
@@ -303,10 +303,10 @@ Enemy.update = function() {
 // 무작위로 적군 생성
 Enemy.randomlyGenerate = function() {
     var id      = Math.random();
-    var x       = Math.random() * currentMap.width;
-    var y       = Math.random() * currentMap.height;
-    var width   = 64;
-    var height  = 64;
+    var x       = Math.random() * Maps.current.width;
+    var y       = Math.random() * Maps.current.height;
+    var width   = 64*1.5;
+    var height  = 64*1.5;
     if( Math.random() < 0.5 ) {
         Enemy( id, x, y, width, height, images.bat, 2, 1 );
     } else {
@@ -351,8 +351,8 @@ Upgrade.update = function() {
 // 무작위로 강화 아이템 생성
 Upgrade.randomlyGenerate = function() {
     var id      = Math.random();
-    var x       = Math.random() * currentMap.width;
-    var y       = Math.random() * currentMap.height;
+    var x       = Math.random() * Maps.current.width;
+    var y       = Math.random() * Maps.current.height;
     var width   = 32;
     var height  = 32;
 
@@ -397,11 +397,16 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
                     Enemy.list[key2].hp -= 1;
                 }
             }
+        // 플레이어와 충돌 처리
         } else if( self.combatType === 'enemy' ) {
             if( self.testCollision( player ) ) {
                 toRemove = true;
                 player.hp -= 1;
             }
+        }
+        // 맵 오브젝트에 충돌
+        if( Maps.current.isPositionWall(self) ) {
+            toRemove = true;
         }
 
         if( toRemove ) {
@@ -412,10 +417,10 @@ Bullet = function ( id, x, y, speedX, speedY, width, height, combatType ) {
         self.x += self.speedX;
         self.y += self.speedY;
 
-        if( self.x < 0 || self.x > currentMap.width ) {
+        if( self.x < 0 || self.x > Maps.current.width ) {
             self.speedX = -self.speedX;
         }
-        if( self.y < 0 || self.y > currentMap.height ) {
+        if( self.y < 0 || self.y > Maps.current.height ) {
             self.speedY = -self.speedY;
         }
     }
