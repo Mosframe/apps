@@ -153,7 +153,7 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
 // -----------------------------------------------------------------------------
 // 플레이어
 Player = function(){
-    var self = Actor( 'player','myId', 50, 40, 50*1.5, 70*1.5, images.player, 10, 1 );
+    var self = Actor( 'player','myId', 0, 0, 50*1.5, 70*1.5, images.player, 10, 1 );
 
     // 위치 갱신
     self.updatePosition = function() {
