@@ -1,4 +1,4 @@
-<!-- Entity로 모든 객체를 상속관계로 정리함 -->
+<!-- Entity update함수 정리 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -19,17 +19,68 @@ var player;
 
 Entity = function(type,id,x,y,speedX,speedY,width,height,color) {
     var self = {
-        type            : type,
-        id              : id,
-        x               : x,
-        y               : y,
-        speedX          : speedX,
-        speedY          : speedY,
-        width           : width,
-        height          : height,
-        color           : color,
+        type    : type,
+        id      : id,
+        x       : x,
+        y       : y,
+        speedX  : speedX,
+        speedY  : speedY,
+        width   : width,
+        height  : height,
+        color   : color,
+    }
+    // 엔티티 갱신
+    self.update = function () {
+        updateEntityPosition( self );
+        drawEntity( self );
     }
     return self;
+}
+
+// 엔티티 위치 갱신
+updateEntityPosition = function( entity ) {
+    if( entity.type === 'player' ) {
+        if( entity.pressingRight ) {
+            entity.x += 10;
+        }
+        if( entity.pressingLeft ) {
+            entity.x -= 10;
+        }
+        if( entity.pressingDown ) {
+            entity.y += 10;
+        }
+        if( entity.pressingUp ) {
+            entity.y -= 10;
+        }
+
+        // 이동제한
+        if( entity.x < entity.width/2 )
+            entity.x = entity.width/2;
+        if( entity.x > WIDTH-entity.width/2 )
+            entity.x = WIDTH-entity.width/2;
+        if( entity.y < entity.height/2 )
+            entity.y = entity.height/2;
+        if( entity.y > HEIGHT-entity.height/2 )
+            entity.y = HEIGHT-entity.height/2;
+
+    } else {
+        entity.x += entity.speedX;
+        entity.y += entity.speedY;
+
+        if( entity.x < 0 || entity.x > WIDTH ) {
+            entity.speedX = -entity.speedX;
+        }
+        if( entity.y < 0 || entity.y > HEIGHT ) {
+            entity.speedY = -entity.speedY;
+        }
+    }
+}
+// 엔티티 그리기
+drawEntity = function( entity ) {
+    ctx.save();
+    ctx.fillStyle = entity.color;
+    ctx.fillRect(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height );
+    ctx.restore();
 }
 
 // 플레이어 생성
@@ -157,65 +208,12 @@ generateBullet = function( actor, overwriteAngle ) {
     Bullet( id, x, y, speedX, speedY, width, height );
 }
 
-// 엔티티 갱신
-updateEntity = function ( entity ) {
-    updateEntityPosition( entity );
-    drawEntity( entity );
-}
-
-// 엔티티 위치 갱신
-updateEntityPosition = function( entity ) {
-    if( entity.type === 'player' ) {
-        if( entity.pressingRight ) {
-            entity.x += 10;
-        }
-        if( entity.pressingLeft ) {
-            entity.x -= 10;
-        }
-        if( entity.pressingDown ) {
-            entity.y += 10;
-        }
-        if( entity.pressingUp ) {
-            entity.y -= 10;
-        }
-
-        // 이동제한
-        if( entity.x < entity.width/2 )
-            entity.x = entity.width/2;
-        if( entity.x > WIDTH-entity.width/2 )
-            entity.x = WIDTH-entity.width/2;
-        if( entity.y < entity.height/2 )
-            entity.y = entity.height/2;
-        if( entity.y > HEIGHT-entity.height/2 )
-            entity.y = HEIGHT-entity.height/2;
-
-    } else {
-        entity.x += entity.speedX;
-        entity.y += entity.speedY;
-
-        if( entity.x < 0 || entity.x > WIDTH ) {
-            entity.speedX = -entity.speedX;
-        }
-        if( entity.y < 0 || entity.y > HEIGHT ) {
-            entity.speedY = -entity.speedY;
-        }
-    }
-}
-
 // 박스와 박스 충돌 테스트
 testCollisionRectRect = function( rect1, rect2 ) {
     return rect1.x <= rect2.x+rect2.width
         && rect2.x <= rect1.x+rect1.width
         && rect1.y <= rect2.y+rect2.height
         && rect2.y <= rect1.y+rect1.height;
-}
-
-// 엔티티 그리기
-drawEntity = function( entity ) {
-    ctx.save();
-    ctx.fillStyle = entity.color;
-    ctx.fillRect(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height );
-    ctx.restore();
 }
 
 // 마우스 이동 이벤트 처리
@@ -314,7 +312,7 @@ update = function () {
 
     // 탄환 갱신
     for( var key in bullets ) {
-        updateEntity(bullets[key]);
+        bullets[key].update();
 
         var toRemove = false;
 
@@ -341,7 +339,7 @@ update = function () {
 
     // 강화 아이템 갱신
     for( var key in upgrades ) {
-        updateEntity(upgrades[key]);
+        upgrades[key].update();
 
         var isColliding = testCollisionEntity( player, upgrades[key] );
         if( isColliding ) {
@@ -357,7 +355,7 @@ update = function () {
 
     // 적군 갱신
     for( var key in enemies ) {
-        updateEntity(enemies[key]);
+        enemies[key].update();
 
         var isColliding = testCollisionEntity( player, enemies[key] );
         if( isColliding ) {
@@ -371,7 +369,7 @@ update = function () {
         console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
         startNewGame();
     }
-    updateEntity(player);
+    player.update();
     ctx.fillText(player.hp + " Hp", 0, 30 );
     ctx.fillText("Score: " + score, 200, 30 );
 }

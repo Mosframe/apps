@@ -60,5 +60,6 @@
 048. 공격함수와 특수공격 함수를 만들어 재사용이 가능하도록 수정
 049. 모든 객체들의 구조를 Entity로 통합하여 최적화한다
 050. Entity로 모든 객체를 상속관계로 정리함
+051. Entity update함수 정리
 
 [index.html](../../01-sample/index.html)
