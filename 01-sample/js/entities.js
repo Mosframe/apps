@@ -96,25 +96,43 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
     // 위치 갱신
     self.updatePosition = function() {
 
+        // 이동
         // 액터의 4방향 범퍼에 벽에 붙이치면 해당 방향으로 이동불가
         var leftBumper  = {x:self.x-40  , y:self.y      };
         var rightBumper = {x:self.x+40  , y:self.y      };
         var upBumper    = {x:self.x     , y:self.y-16   };
         var downBumper  = {x:self.x     , y:self.y+64   };
 
-        // 이동
-        if( self.pressingLeft   && !Maps.current.isPositionWall( leftBumper ) ) {
-            self.x -= self.moveSpeedMax;
+        // 바운딩 처리 (+-5)
+        if( Maps.current.isPositionWall( leftBumper ) ) {
+            self.x += 5;
+        } else {
+            if( self.pressingLeft ) {
+                self.x -= self.moveSpeedMax;
+            }
         }
-        if( self.pressingRight  && !Maps.current.isPositionWall( rightBumper) ) {
-            self.x += self.moveSpeedMax;
+        if( Maps.current.isPositionWall( rightBumper ) ) {
+            self.x -= 5;
+        } else {
+            if( self.pressingRight ) {
+                self.x += self.moveSpeedMax;
+            }
         }
-        if( self.pressingUp     && !Maps.current.isPositionWall( upBumper   ) ) {
-            self.y -= self.moveSpeedMax;
+        if( Maps.current.isPositionWall( upBumper   ) ) {
+            self.y += 5;
+        } else {
+            if( self.pressingUp ) {
+                self.y -= self.moveSpeedMax;
+            }
         }
-        if( self.pressingDown   && !Maps.current.isPositionWall( downBumper ) ) {
-            self.y += self.moveSpeedMax;
+        if( Maps.current.isPositionWall( downBumper ) ) {
+            self.y -= 5;
+        } else {
+            if( self.pressingDown ) {
+                self.y += self.moveSpeedMax;
+            }
         }
+
 
         // 이동제한
         if( self.x < self.width/2 )
