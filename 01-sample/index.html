@@ -1,4 +1,4 @@
-<!-- DONE : 각종 전역함수들 오브젝트에 종속시킴 -->
+<!-- DONE : 플레이어가 마우스를 누르고 있으면 총알 자동 발사 -->
 
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
@@ -81,14 +81,25 @@ document.onmousemove = function( mouse ) {
     player.aimAngle = Math.atan2(mouseY,mouseX) / Math.PI * 180;
 }
 
-// 마우스 좌클릭
-document.onclick = function( mouse ) {
-    player.performAttack();
+// 마우스 클릭 다운 이벤트
+document.onmousedown = function( mouse ) {
+    if(mouse.which === 1 ) {
+        player.pressingMouseLeft = true;
+    } else {
+        player.pressingMouseRight = true;
+    }
+}
+// 마우스 클릭 업 이벤트
+document.onmouseup = function( mouse ) {
+    if(mouse.which === 1 ) {
+        player.pressingMouseLeft = false;
+    } else {
+        player.pressingMouseRight = false;
+    }
 }
 
 // 마우스 우클릭
 document.oncontextmenu = function( mouse ) {
-    player.performSpecialAttack();
     mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
 }
 

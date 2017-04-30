@@ -149,6 +149,13 @@ Player = function(){
     var super_update = self.update;
     self.update = function() {
         super_update();
+
+        if( self.pressingMouseLeft ) {
+            self.performAttack();
+        }
+        if( self.pressingMouseRight ) {
+            self.performSpecialAttack();
+        }
     }
     // 죽음
     self.onDeath = function() {
