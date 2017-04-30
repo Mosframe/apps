@@ -53,12 +53,24 @@ socket.on('addChat',function(data){
 });
 
 // -----------------------------------------------------------------------------
+// 서버로 부터 eval 결과를 수신 받는다.
+socket.on('resEval',function(data){
+    console.log(data);
+});
+
+// -----------------------------------------------------------------------------
 // 서버에 채팅 메시지를 전송한다.
 chatForm.onsubmit = function(e) {
-    e.preventDefault(); // 이벤트 전파를 막지 않고 이벤트 취소
-    socket.emit( 'sendChat', chatInput.value );
+    e.preventDefault(); // 이벤트 전파(상위에 테그들에 전달)를 막지 않고 이벤트 실행 취소
+
+    // 서버측에서 코드 실행을하고 결과를 받는다.
+    if( chatInput.value[0] === '/' )
+        socket.emit( 'reqEval', chatInput.value.slice(1) );
+    else
+        socket.emit( 'sendChat', chatInput.value );
     chatInput.value = '';
 }
+
 
 // -----------------------------------------------------------------------------
 // 키보드 키 다운 이벤트

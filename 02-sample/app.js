@@ -2,6 +2,8 @@
 // app : 서비스 시작
 // -----------------------------------------------------------------------------
 
+var DEBUG = true;
+
 // express 생성
 var express = require('express');
 var app = express();
@@ -188,6 +190,14 @@ io.sockets.on('connection', function(socket){
         for( var i in sockets ) {
             sockets[i].emit('addChat', playerName + ' : ' + data );
         }
+    });
+    // 명령 실행
+    // TODO : 서버 해킹(데이터베이스를 조작하거나 삭제하는등...)이 가능할 수 있으므로 아무에게나 허용되지 않도록 서비스 전에 반드시 삭제하거나 관리자만 허용되도록 개선해야 한다.
+    socket.on('reqEval',function(data){
+        if( !DEBUG ) return;
+
+        var res = eval(data); // eval() 자바스크립트 코드를 계산하고 실행한다. (https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/eval)
+        socket.emit('resEval', res );
     });
     // 접속종료 처리
     socket.on('disconnect',function(){
