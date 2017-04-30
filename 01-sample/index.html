@@ -1,10 +1,10 @@
-<!-- 적들의 스폰위치와 외형을 무작위로 생성해 본다.  -->
+<!-- 일정시간이 지날때마다 적들이 추가로 생성되도록 한다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
 
-// DONE : 무작위로 적군 생성
+// DONE : 일정시간 후에 적군 추가 생성
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -13,6 +13,9 @@ ctx.font = '30px Arial';
 var WIDTH    = 500;
 var HEIGHT   = 500;
 var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
+
+
+var frameCount = 0;
 
 // player
 var player = {
@@ -124,6 +127,17 @@ drawEntity = function( something ) {
 update = function () {
     ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
 
+    ++frameCount;
+
+    // 적군 생성
+    if( frameCount === 100 ) // 4초 후에
+        randomlyGenerateEnemy();
+    if( frameCount === 200 ) // 8초 후에
+        randomlyGenerateEnemy();
+    if( frameCount === 300 ) // 12초 후에
+        randomlyGenerateEnemy();
+
+    // 적군 갱신
     for( var key in enemies ) {
         updateEntity(enemies[key]);
 
