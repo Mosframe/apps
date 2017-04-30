@@ -1,10 +1,8 @@
-<!-- 마우스 좌클릭할때 플레이어가 공격을 하도록 한다.  -->
+<!-- 키보드로 플레이어 이동 컨트롤 하기  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
-
-// DONE :
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -32,6 +30,11 @@ var player = {
     color           : 'green',
     attackSpeed     : 1, // 공격속도 (초당 발사량)
     attackCounter   : 0, // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+
+    pressingDown    : false,
+    pressingUp      : false,
+    pressingLeft    : false,
+    pressingRight   : false,
 }
 
 // 적군들
@@ -199,6 +202,8 @@ drawEntity = function( something ) {
 
 // 마우스 이동 이벤트 처리
 document.onmousemove = function( mouse ) {
+    /*
+    // 마우스로 플레이어 이동 컨트롤
     var mouseX = mouse.clientX - document.getElementById('ctx').getBoundingClientRect().left;
     var mouseY = mouse.clientY - document.getElementById('ctx').getBoundingClientRect().top;
 
@@ -213,6 +218,7 @@ document.onmousemove = function( mouse ) {
 
     player.x = mouseX;
     player.y = mouseY;
+    */
 }
 
 // 마우스 클릭
@@ -222,6 +228,60 @@ document.onclick = function( mouse ) {
         randomlyGenerateBullet();
         player.attackCounter = 0;
     }
+}
+
+// 키보드 키 다운 이벤트
+document.onkeydown = function( event ) {
+    //console.log(evnet.keyCode);
+    // 자바스크립트 키코드 표 : http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+    if( event.keyCode === 68 ) {        // d
+        player.pressingRight = true;
+    } else if( event.keyCode === 83 ) { // s
+        player.pressingDown = true;
+    } else if( event.keyCode === 65 ) { // a
+        player.pressingLeft = true;
+    } else if( event.keyCode === 87 ) { // w
+        player.pressingUp = true;
+    }
+}
+
+// 키보드 키 업 이벤트
+document.onkeyup = function( event ) {
+    if( event.keyCode === 68 ) {        // d
+        player.pressingRight = false;
+    } else if( event.keyCode === 83 ) { // s
+        player.pressingDown = false;
+    } else if( event.keyCode === 65 ) { // a
+        player.pressingLeft = false;
+    } else if( event.keyCode === 87 ) { // w
+        player.pressingUp = false;
+    }
+}
+
+// 플레이어 위치 갱신
+updatePlayerPosition = function() {
+    if( player.pressingRight ) {
+        player.x += 10;
+    }
+    if( player.pressingLeft ) {
+        player.x -= 10;
+    }
+    if( player.pressingDown ) {
+        player.y += 10;
+    }
+    if( player.pressingUp ) {
+        player.y -= 10;
+    }
+
+    // 이동제한
+    if( player.x < player.width/2 )
+        player.x = player.width/2;
+    if( player.x > WIDTH-player.width/2 )
+        player.x = WIDTH-player.width/2;
+    if( player.y < player.height/2 )
+        player.y = player.height/2;
+    if( player.y > HEIGHT-player.height/2 )
+        player.y = HEIGHT-player.height/2;
 }
 
 // update
@@ -301,7 +361,7 @@ update = function () {
         console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
         startNewGame();
     }
-
+    updatePlayerPosition();
     drawEntity(player);
     ctx.fillText(player.hp + " Hp", 0, 30 );
     ctx.fillText("Score: " + score, 200, 30 );
