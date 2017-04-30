@@ -1,8 +1,10 @@
-<!-- 플레이어가 화면을 벋어나지 않도록 한다.  -->
+<!-- 적들의 스폰위치와 외형을 무작위로 생성해 본다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
+
+// DONE : 무작위로 적군 생성
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -143,9 +145,21 @@ update = function () {
     ctx.fillText(player.hp + " Hp", 0, 30 );
 }
 
-Enemy('E1',150,350,10, 15, 40, 40 );
-Enemy('E2',250,350,10,-15, 25, 40 );
-Enemy('E3',250,150,10,- 8, 40, 25 );
+// 무작위로 적군 생성
+randomlyGenerateEnemy = function() {
+    var id      = Math.random();
+    var x       = Math.random() * WIDTH;
+    var y       = Math.random() * HEIGHT;
+    var speedX  =  5 + Math.random() *  5; //  5 ~ 10
+    var speedY  =  5 + Math.random() *  5; //  5 ~ 10
+    var width   = 10 + Math.random() * 30; // 10 ~ 40
+    var height  = 10 + Math.random() * 30; // 10 ~ 40
+    Enemy( id, x, y, speedX, speedY, width, height );
+}
+
+randomlyGenerateEnemy();
+randomlyGenerateEnemy();
+randomlyGenerateEnemy();
 
 setInterval( update, 40 );
 
