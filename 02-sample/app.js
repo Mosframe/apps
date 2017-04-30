@@ -1,4 +1,6 @@
+// -----------------------------------------------------------------------------
 // app : 서비스 시작
+// -----------------------------------------------------------------------------
 
 // express 생성
 var express = require('express');
@@ -20,54 +22,78 @@ app.use('/client', express.static(__dirname + '/client/assets/'));
 // Http서버에서 2000 포트를 통해서 클라이언트 요청을 받는다.
 server.listen(2000);
 console.log('server started');
-
 var sockets = {};
-var players = {};
 
-// 플레이어 클래스
-var Player = function(id) {
+// -----------------------------------------------------------------------------
+// 엔티티
+// -----------------------------------------------------------------------------
+var Entity = function() {
     var self = {
+        id              : "",
         x               : 250,
         y               : 250,
-        id              : id,
-        name            : "" + Math.floor(10*Math.random()),
-        pressingDown    : false,
-        pressingUp      : false,
-        pressingLeft    : false,
-        pressingRight   : false,
-        moveSpeedMax    : 10,
+        moveSpeedX      : 0,
+        moveSpeedY      : 0,
     }
-
+    // 갱신
+    self.update = function () {
+        self.updatePosition();
+    }
+    // 위치 갱신
     self.updatePosition = function() {
-
-        // 이동
-        if( self.pressingRight ) {
-            self.x += self.moveSpeedMax;
-        }
-        if( self.pressingLeft ) {
-            self.x -= self.moveSpeedMax;
-        }
-        if( self.pressingDown ) {
-            self.y += self.moveSpeedMax;
-        }
-        if( self.pressingUp ) {
-            self.y -= self.moveSpeedMax;
-        }
+        self.x += self.moveSpeedX;
+        self.y += self.moveSpeedY;
     }
-
-
     return self;
 }
 
-// Socket.io를 통해 WebSocket 서비스를 시작한다.
-var io = require('socket.io')(server,{});
-io.sockets.on('connection', function(socket){
-    console.log('socket connection');
-    // 소켓을 소켓DB에 등록한다.
-    sockets[socket.id] = socket;
+// -----------------------------------------------------------------------------
+// 플레이어 클래스
+// -----------------------------------------------------------------------------
+var Player = function(id) {
+    var self            = Entity();
+    self.id             = id;
+    self.name           = "" + Math.floor(10*Math.random());
+    self.pressingDown   = false;
+    self.pressingUp     = false;
+    self.pressingLeft   = false;
+    self.pressingRight  = false;
+    self.moveSpeedMax   = 10;
+
+    // 갱신
+    var super_update = self.update;
+    self.update = function() {
+        self.updateMoveSpeed();
+        super_update();
+    }
+
+    // 이동속도 갱신
+    self.updateMoveSpeed = function() {
+        // 이동
+        if( self.pressingRight ) {
+            self.moveSpeedX = self.moveSpeedMax;
+        } else if( self.pressingLeft ) {
+            self.moveSpeedX =-self.moveSpeedMax;
+        } else {
+            self.moveSpeedX = 0;
+        }
+        if( self.pressingDown ) {
+            self.moveSpeedY = self.moveSpeedMax;
+        } else if( self.pressingUp ) {
+            self.moveSpeedY =-self.moveSpeedMax;
+        } else {
+            self.moveSpeedY = 0;
+        }
+    }
+    Player.list[id] = self;
+    return self;
+}
+// 플레이어 리스트 생성
+Player.list = {};
+// 접속 이벤트
+Player.onConnect = function(socket) {
     // 플레이어 생성 > 등록
     var player = Player(socket.id);
-    players[socket.id] = player;
 
     socket.on('keyPress',function(data){
         switch( data.inputId ) {
@@ -77,30 +103,49 @@ io.sockets.on('connection', function(socket){
         case 'down' : player.pressingDown   = data.state; break;
         }
     });
-
-    // 접속종료 처리
-    socket.on('disconnect',function(){
-        delete sockets[socket.id];
-        delete players[socket.id];
-    });
-});
-
-// 서버 틱 업데이트 : 25fps
-setInterval( function(){
-
+}
+// 접속종료 이벤트
+Player.onDisconnect = function(socket) {
+    delete Player.list[socket.id];
+}
+// 플레이어 리스트 갱신
+Player.updates = function(){
     var pack = [];
-
     // 모든 플레이어들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
-    for( var playerId in players ) {
-        var player = players[playerId];
-        player.updatePosition();
+    for( var playerId in Player.list ) {
+        var player = Player.list[playerId];
+        player.update();
         pack.push({
             x:player.x,
             y:player.y,
             name:player.name,
         });
     }
+    return pack;
+}
 
+// -----------------------------------------------------------------------------
+
+// Socket.io를 통해 WebSocket 서비스를 시작한다.
+var io = require('socket.io')(server,{});
+io.sockets.on('connection', function(socket){
+    console.log('socket connection : '+ socket.id );
+    // 소켓을 소켓DB에 등록한다.
+    sockets[socket.id] = socket;
+    // 플레이어 생성 및 등록
+    Player.onConnect(socket);
+    // 접속종료 처리
+    socket.on('disconnect',function(){
+        delete sockets[socket.id];
+        Player.onDisconnect(socket);
+    });
+});
+
+// -----------------------------------------------------------------------------
+
+// 서버 틱 업데이트 : 25fps
+setInterval( function(){
+    var pack = Player.updates();
     // 모든 클라이언트들에게 패키지 데이터를 보낸다.
     for( var socketId in sockets ) {
         var socket = sockets[socketId];
