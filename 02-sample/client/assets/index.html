@@ -7,10 +7,12 @@ Hello world
     // 서버에 접속한다.
     var socket = io();
 
+    var random = Math.random();
+
     // 서버에 메시지를 보낸다.
     var sendMsg = function(){
         socket.emit('message',{
-            name:'mosframe'
+            name:'mosframe' + random
         });
     }
     //sendMsg();
