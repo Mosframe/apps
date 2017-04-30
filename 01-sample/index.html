@@ -1,4 +1,4 @@
-<!-- 플레이어와 적들이 충돌했는지 콘솔창으로 통해 확인한다.  -->
+<!-- 갱신함수를 이동갱신부분과 드로잉부분으로 분리한다  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -22,25 +22,21 @@ var player = {
 
 // enemy
 var enemies = {};
-Enemy('E1',150,350,10, 15);
-Enemy('E2',250,350,10,-15);
-Enemy('E3',250,150,10,-8);
-
 
 // 두 물체 사이의 거리값을 구한다.
-function getDistanceBetweenEntity( entity1, entity2 ) {
+getDistanceBetweenEntity = function ( entity1, entity2 ) {
     var vx = entity1.x - entity2.x;
     var vy = entity1.y - entity2.y;
     return Math.sqrt( vx*vx + vy*vy );
 }
 
 // 두 물체가 충돌했는지 알아낸다.
-function testCollisionEntity( entity1, entity2 ) {
+testCollisionEntity = function ( entity1, entity2 ) {
     var distance = getDistanceBetweenEntity( entity1, entity2 );
     return distance < 30;
 }
 
-function Enemy( id, x, y, speedX, speedY ) {
+Enemy = function ( id, x, y, speedX, speedY ) {
     var enemy = {
         id      : id,
         x       : x,
@@ -52,14 +48,15 @@ function Enemy( id, x, y, speedX, speedY ) {
     enemies[id] = enemy;
 }
 
-
-setInterval( update, 40 );
-
 // update entity
-function updateEntity( something ) {
+updateEntity = function ( something ) {
+    updateEntityPosition( something );
+    drawEntity( something );
+}
+
+updateEntityPosition = function( something ) {
     something.x += something.speedX;
     something.y += something.speedY;
-    ctx.fillText(something.name, something.x, something.y);
 
     if( something.x < 0 || something.x > WIDTH ) {
         something.speedX = -something.speedX;
@@ -69,8 +66,12 @@ function updateEntity( something ) {
     }
 }
 
+drawEntity = function( something ) {
+    ctx.fillText(something.name, something.x, something.y);
+}
+
 // update
-function update() {
+update = function () {
     ctx.clearRect(0,0,WIDTH,HEIGHT); // 영역 삭제
 
     for( var key in enemies ) {
@@ -84,5 +85,12 @@ function update() {
 
     updateEntity(player);
 }
+
+
+Enemy('E1',150,350,10, 15);
+Enemy('E2',250,350,10,-15);
+Enemy('E3',250,150,10,-8);
+
+setInterval( update, 40 );
 
 </script>
