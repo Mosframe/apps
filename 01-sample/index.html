@@ -1,9 +1,8 @@
-<!-- 플레이어 공격속도 속성 추가  -->
+<!-- 강화 아이템을 점수획득과 공격속도 증가 아이템으로 분류  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
 <script>
-
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -29,7 +28,7 @@ var player = {
     width       : 20,
     height      : 40,
     color       : 'green',
-    attackSpeed : 5, // 공격속도 (초당 발사량)
+    attackSpeed : 1, // 공격속도 (초당 발사량)
 }
 
 // 적군들
@@ -119,10 +118,10 @@ randomlyGenerateUpgrade = function() {
     var height  = 10;
 
     if( Math.random()<0.5) {
-        var category    = 'low';
+        var category    = 'score';
         var color       = 'orange';
     } else {
-        var category    = 'high';
+        var category    = 'attackSpeed';
         var color       = 'purple';
     }
 
@@ -265,11 +264,11 @@ update = function () {
 
         var isColliding = testCollisionEntity( player, upgrades[key] );
         if( isColliding ) {
-            if( upgrades[key].category === 'low' ) {
+            if( upgrades[key].category === 'score' ) {
                 score += 1000;
             }
-            if( upgrades[key].category === 'high' ) {
-                score += 10000;
+            if( upgrades[key].category === 'attackSpeed' ) {
+                player.attackSpeed += 3;
             }
             delete upgrades[key];
         }
