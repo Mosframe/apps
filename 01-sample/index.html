@@ -1,4 +1,4 @@
-<!-- 갱신함수를 이동갱신부분과 드로잉부분으로 분리한다  -->
+<!-- 마우스로 플레이어를 이동시킨다.  -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -48,6 +48,14 @@ Enemy = function ( id, x, y, speedX, speedY ) {
     enemies[id] = enemy;
 }
 
+document.onmousemove = function( mouse ) {
+    var mouseX = mouse.clientX;
+    var mouseY = mouse.clientY;
+
+    player.x = mouseX;
+    player.y = mouseY;
+}
+
 // update entity
 updateEntity = function ( something ) {
     updateEntityPosition( something );
@@ -83,7 +91,7 @@ update = function () {
         }
     }
 
-    updateEntity(player);
+    drawEntity(player);
 }
 
 
