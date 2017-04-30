@@ -6,7 +6,7 @@
 ---
 
 ## 1. 캔버스에 게임의 기본 구성요소(Input,Update,Draw) 제작
-01. [Cavas 이해하기](./client/client.01.md)
+01. [Cavas 이해하기](./01-sample/01.md)
 02. [캔버스에 텍스트형 플레이어와 적군 그리기](../../client/assets/01-tutorial/01/index.03.html)
 03. [캔버스안에서 플레이어, 적군 이동하기](../../client/assets/01-tutorial/01/index.04.html)
 04. [박스형태의 플레이어, 적군 생성](../../client/assets/01-tutorial/01/index.04.html)
