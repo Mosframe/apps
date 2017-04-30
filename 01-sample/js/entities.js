@@ -97,8 +97,23 @@ Actor = function( type, id, x, y, width, height, image, hp, attackSpeed ) {
         x -= self.width/2;
         y -= self.height/2;
 
+        // 공격방향의 음수값을 양수값으로 변환한다.
+        var aimAngle = self.aimAngle;
+        if( aimAngle < 0 ) aimAngle = 360 + aimAngle;
+
+        // 공격방향에 따른 스프라이트 번호 설정
+        var directionMod = 3; // right
+        if(aimAngle >= 45 && aimAngle < 135 ) // down
+            directionMod = 2;
+        else if(aimAngle >= 135 && aimAngle < 225 ) // left
+            directionMod = 1;
+        else if(aimAngle >= 225 && aimAngle < 315 ) // up
+            directionMod = 0;
+
         // 스프라이트에서 정면 이미지 그리기
-        ctx.drawImage(self.image,0,self.image.height/2,self.image.width/3,self.image.height/4,x,y,width,height);
+        var frameWidth  = self.image.width/3;
+        var frameHeight = self.image.height/4;
+        ctx.drawImage(self.image,0,directionMod*frameHeight,frameWidth,frameHeight,x,y,width,height);
         ctx.restore();
     }
     // 죽음
