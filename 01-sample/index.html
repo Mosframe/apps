@@ -1,4 +1,4 @@
-<!-- 공격함수와 특수공격 함수를 만들어 재사용이 가능하도록 수정 -->
+<!-- 모든 객체들의 구조를 Entity로 통합하여 최적화한다 -->
 <meta charset="UTF-8">
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
@@ -16,26 +16,31 @@ var timeWhenGameStarted = Date.now(); // 게임시작 시간 저장
 var frameCount = 0;
 
 var score = 0;
+var player;
 
-// player
-var player = {
-    x               : 50,
-    y               : 40,
-    speedX          : 30,
-    speedY          : 5,
-    name            : 'Player',
-    hp              : 10,
-    width           : 20,
-    height          : 40,
-    color           : 'green',
-    attackSpeed     : 1, // 공격속도 (초당 발사량)
-    attackCounter   : 0, // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
-    aimAngle        : 0, // 공격방향(각도)
+// 플레이어 생성
+createPlayer = function(){
+    player = {
+        type            : 'player',
+        x               : 50,
+        y               : 40,
+        speedX          : 30,
+        speedY          : 5,
+        name            : 'Player',
+        hp              : 10,
+        width           : 20,
+        height          : 40,
+        color           : 'green',
 
-    pressingDown    : false,
-    pressingUp      : false,
-    pressingLeft    : false,
-    pressingRight   : false,
+        attackSpeed     : 1, // 공격속도 (초당 발사량)
+        attackCounter   : 0, // 공격카운터, 공격속도를 컨트롤할때 매개체로 사용한다.
+        aimAngle        : 0, // 공격방향(각도)
+
+        pressingDown    : false,
+        pressingUp      : false,
+        pressingLeft    : false,
+        pressingRight   : false,
+    };
 }
 
 // 적군들
@@ -72,6 +77,7 @@ testCollisionEntity = function ( entity1, entity2 ) {
 // 적군 생성 함수
 Enemy = function ( id, x, y, speedX, speedY, width, height ) {
     var enemy = {
+        type            : 'enemy',
         id              : id,
         x               : x,
         y               : y,
@@ -103,6 +109,7 @@ randomlyGenerateEnemy = function() {
 // 강화 아이템 생성 함수
 Upgrade = function ( id, x, y, speedX, speedY, width, height, category, color ) {
     var upgrade = {
+        type    : 'upgrade',
         id      : id,
         x       : x,
         y       : y,
@@ -141,6 +148,7 @@ randomlyGenerateUpgrade = function() {
 // 탄환 생성 함수
 Bullet = function ( id, x, y, speedX, speedY, width, height ) {
     var bullet = {
+        type    : 'bullet',
         id      : id,
         x       : x,
         y       : y,
@@ -173,21 +181,47 @@ generateBullet = function( actor, overwriteAngle ) {
 }
 
 // 엔티티 갱신
-updateEntity = function ( something ) {
-    updateEntityPosition( something );
-    drawEntity( something );
+updateEntity = function ( entity ) {
+    updateEntityPosition( entity );
+    drawEntity( entity );
 }
 
 // 엔티티 위치 갱신
-updateEntityPosition = function( something ) {
-    something.x += something.speedX;
-    something.y += something.speedY;
+updateEntityPosition = function( entity ) {
+    if( entity.type === 'player' ) {
+        if( entity.pressingRight ) {
+            entity.x += 10;
+        }
+        if( entity.pressingLeft ) {
+            entity.x -= 10;
+        }
+        if( entity.pressingDown ) {
+            entity.y += 10;
+        }
+        if( entity.pressingUp ) {
+            entity.y -= 10;
+        }
 
-    if( something.x < 0 || something.x > WIDTH ) {
-        something.speedX = -something.speedX;
-    }
-    if( something.y < 0 || something.y > HEIGHT ) {
-        something.speedY = -something.speedY;
+        // 이동제한
+        if( entity.x < entity.width/2 )
+            entity.x = entity.width/2;
+        if( entity.x > WIDTH-entity.width/2 )
+            entity.x = WIDTH-entity.width/2;
+        if( entity.y < entity.height/2 )
+            entity.y = entity.height/2;
+        if( entity.y > HEIGHT-entity.height/2 )
+            entity.y = HEIGHT-entity.height/2;
+
+    } else {
+        entity.x += entity.speedX;
+        entity.y += entity.speedY;
+
+        if( entity.x < 0 || entity.x > WIDTH ) {
+            entity.speedX = -entity.speedX;
+        }
+        if( entity.y < 0 || entity.y > HEIGHT ) {
+            entity.speedY = -entity.speedY;
+        }
     }
 }
 
@@ -200,10 +234,10 @@ testCollisionRectRect = function( rect1, rect2 ) {
 }
 
 // 엔티티 그리기
-drawEntity = function( something ) {
+drawEntity = function( entity ) {
     ctx.save();
-    ctx.fillStyle = something.color;
-    ctx.fillRect(something.x-something.width/2, something.y-something.height/2, something.width, something.height );
+    ctx.fillStyle = entity.color;
+    ctx.fillRect(entity.x-entity.width/2, entity.y-entity.height/2, entity.width, entity.height );
     ctx.restore();
 }
 
@@ -230,7 +264,6 @@ performAttack = function(actor){
         generateBullet(actor);
     }
 }
-
 
 // 마우스 우클릭
 document.oncontextmenu = function( mouse ) {
@@ -282,32 +315,6 @@ document.onkeyup = function( event ) {
     } else if( event.keyCode === 87 ) { // w
         player.pressingUp = false;
     }
-}
-
-// 플레이어 위치 갱신
-updatePlayerPosition = function() {
-    if( player.pressingRight ) {
-        player.x += 10;
-    }
-    if( player.pressingLeft ) {
-        player.x -= 10;
-    }
-    if( player.pressingDown ) {
-        player.y += 10;
-    }
-    if( player.pressingUp ) {
-        player.y -= 10;
-    }
-
-    // 이동제한
-    if( player.x < player.width/2 )
-        player.x = player.width/2;
-    if( player.x > WIDTH-player.width/2 )
-        player.x = WIDTH-player.width/2;
-    if( player.y < player.height/2 )
-        player.y = player.height/2;
-    if( player.y > HEIGHT-player.height/2 )
-        player.y = HEIGHT-player.height/2;
 }
 
 // update
@@ -387,8 +394,7 @@ update = function () {
         console.log("You lost! | 플레이 시간 " + timeSurvived + " ms." );
         startNewGame();
     }
-    updatePlayerPosition();
-    drawEntity(player);
+    updateEntity(player);
     ctx.fillText(player.hp + " Hp", 0, 30 );
     ctx.fillText("Score: " + score, 200, 30 );
 }
@@ -407,7 +413,7 @@ startNewGame = function() {
     randomlyGenerateEnemy();
 }
 
-
+createPlayer();
 startNewGame();
 setInterval( update, 40 ); // 1000/40=25fps
 
