@@ -38,14 +38,22 @@ io.sockets.on('connection', function(socket){
 // 서버 틱 업데이트 : 25fps
 setInterval( function(){
 
-    // 모든 접속자들에게 각자 변경된 위치정보들 보낸다.
+    var pack = [];
+
+    // 모든 클라이언트들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
     for( var socketId in sockets ) {
         var socket = sockets[socketId];
         socket.x++;
         socket.y++;
-        socket.emit('newPosition',{
+        pack.push({
             x:socket.x,
             y:socket.y
         });
+    }
+
+    // 모든 클라이언트들에에 패키지 데이터를 보낸다.
+    for( var socketId in sockets ) {
+        var socket = sockets[socketId];
+        socket.emit( 'newPositions', pack );
     }
 },1000/25);

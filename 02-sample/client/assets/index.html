@@ -11,10 +11,12 @@ ctx.font = '30px Arial';
 var socket = io();
 
 // 서버로 부터 데이터를 수신한다.
-socket.on('newPosition',function(data){
+socket.on('newPositions',function(data){
     ctx.clearRect(0,0,500,500);
     ctx.fillStyle = 'green';
-    ctx.fillRect(data.x-10, data.y-10, 20, 20 );
+    for( var c=0; c<data.length; ++c ) {
+        ctx.fillRect(data[c].x-10, data[c].y-10, 20, 20 );
+    }
 });
 
 </script>
