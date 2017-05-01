@@ -1,29 +1,67 @@
 <meta charset="UTF-8">
-<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
 
-<!-- 채팅출력창 -->
-<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-    <div>Hello!</div>
+
+<!-- 로그인 & 회원가입 -->
+<div id="loginDiv">
+    Username: <input id="loginDivUsername" type="text"></input><br>
+    Password: <input id="loginDivPassword" type="password"></input><br>
+    <button id="loginDivloginIn">login In</button>
 </div>
 
-<!-- 채팅입력창 -->
-<form id="chat-form">
-    <input id="chat-input" type="text" style="width:500px"></input>
-</form>
+<!-- 게임뷰 : 초기엔 display를 꺼놓는다.-->
+<div id="gameDiv" style="display:none">
+    <!-- 캔버스 -->
+    <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+    <!-- 채팅출력창 -->
+    <div id="chatText" style="width:500px;height:100px;overflow-y:scroll">
+        <div>Hello!</div>
+    </div>
+    <!-- 채팅입력창 -->
+    <form id="chatForm">
+        <input id="chatInput" type="text" style="width:500px"></input>
+    </form>
+</div>
 
 <!-- https://cdnjs.com/ 에서 socket.io를 검색하여 원하는 버전을 사용한다.-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script>
 
-var ctx         = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍스트
-var chatText    = document.getElementById('chat-text'   ); // 채팅 출력 문자열
-var chatForm    = document.getElementById('chat-form'   ); // 채팅 입력 폼
-var chatInput   = document.getElementById('chat-input'  ); // 채팅 입력 입력창
-
-ctx.font = '20px Arial';
-
 // 서버에 접속한다.
 var socket = io();
+
+// -----------------------------------------------------------------------------
+// 로그인 로직
+var loginDiv            = document.getElementById('loginDiv'        ); //
+var loginDivUsername    = document.getElementById('loginDivUsername'); //
+var loginDivPassword    = document.getElementById('loginDivPassword'); //
+var loginDivloginIn     = document.getElementById('loginDivloginIn' ); //
+
+// 로그인
+loginDivloginIn.onclick = function() {
+    socket.emit('reqLogin',{
+        username : loginDivUsername.value,
+        password : loginDivPassword.value,
+    });
+}
+
+// 로그인 > 인증 결과
+socket.on('resLogin',function(data){
+    if( data.success ) {
+        loginDiv.style.display = 'none';
+        gameDiv.style.display = 'inline-block';
+    } else {
+        alert("로그인 실패!");
+    }
+});
+
+// -----------------------------------------------------------------------------
+// 게임 로직
+var ctx         = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍스트
+var chatText    = document.getElementById('chatText'   ); // 채팅 출력 문자열
+var chatForm    = document.getElementById('chatForm'   ); // 채팅 입력 폼
+var chatInput   = document.getElementById('chatInput'  ); // 채팅 입력 입력창
+
+ctx.font = '20px Arial';
 
 // -----------------------------------------------------------------------------
 // 서버로 부터 데이터를 수신한다.

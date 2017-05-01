@@ -160,6 +160,7 @@ Player.onConnect = function(socket) {
         case 'attackAngle'  : player.attackAngle            = data.state; break;
         }
     });
+
 }
 // 접속종료 이벤트
 Player.onDisconnect = function(socket) {
@@ -172,6 +173,8 @@ Player.updates = function(){
     for( var playerId in Player.list ) {
         var player = Player.list[playerId];
         player.update();
+
+        // TODO : 패킷 최적화가 필요함, 변경되지 않는 사이즈값은 생성시에만 전송한다.
         pack.push({
             x:player.x,
             y:player.y,
@@ -224,6 +227,8 @@ Bullet.updates = function() {
     for( var bulletId in Bullet.list ) {
         var bullet = Bullet.list[bulletId];
         bullet.update();
+
+        // TODO : 패킷 최적화가 필요함, 변경되지 않는 사이즈값은 생성시에만 전송한다.
         pack.push({
             x:bullet.x,
             y:bullet.y,
@@ -243,9 +248,20 @@ io.sockets.on('connection', function(socket){
     console.log('socket connection : '+ socket.id );
     // 소켓을 소켓DB에 등록한다.
     sockets[socket.id] = socket;
-    // 플레이어 생성 및 등록
-    Player.onConnect(socket);
-    socket.player = Player.list[socket.id];
+
+    // 로그인
+    socket.on('reqLogin',function(data){
+        var success = false;
+        if( data.username === 'mosframe' && data.password === '1234' ) {
+            // 플레이어 생성 및 등록
+            Player.onConnect(socket);
+            socket.player = Player.list[socket.id];
+            success = true;
+        }
+        socket.emit('resLogin', {success:success} );
+    });
+
+
     // 채팅 입력 처리
     socket.on('sendChat',function(data){
         var playerName = socket.player.name;
