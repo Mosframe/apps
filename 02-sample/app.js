@@ -11,6 +11,9 @@ var app = express();
 // http 서버 생성
 var server = require('http').Server(app);
 
+// util
+var util = require('./util');
+
 // 홈 서비스 : http://mywebsite:2000 => http://mywebsite:2000/client/assets/index.html
 app.get('/', function( req, res ) {
     res.sendFile(__dirname + '/client/assets/index.html');
@@ -34,6 +37,8 @@ var Entity = function() {
         id              : "",
         x               : 250,
         y               : 250,
+        width           : 20,
+        height          : 20,
         moveSpeedX      : 0,
         moveSpeedY      : 0,
     }
@@ -46,8 +51,31 @@ var Entity = function() {
         self.x += self.moveSpeedX;
         self.y += self.moveSpeedY;
     }
+    // 타겟과의 거리값을 구한다.
+    self.getDistance = function ( target ) {
+        var vx = self.x - target.x;
+        var vy = self.y - target.y;
+        return Math.sqrt( vx*vx + vy*vy );
+    }
+    // 타겟과 충돌했는지 알아낸다.
+    self.testCollision = function ( target ) {
+        var rect1 = {
+            x:self.x-self.width/2,
+            y:self.y-self.height/2,
+            width:self.width,
+            height:self.height,
+        }
+        var rect2 = {
+            x:target.x-target.width/2,
+            y:target.y-target.height/2,
+            width:target.width,
+            height:target.height,
+        }
+        return util.testCollisionRect2( rect1, rect2 );
+    }
     return self;
 }
+
 
 // -----------------------------------------------------------------------------
 // 플레이어
@@ -78,7 +106,7 @@ var Player = function(id) {
 
     // 총알 발사
     self.shootBullet = function(angle) {
-        var bullet = Bullet( angle );
+        var bullet = Bullet( self, angle );
         bullet.x = self.x;
         bullet.y = self.y;
     }
@@ -138,6 +166,8 @@ Player.updates = function(){
         pack.push({
             x:player.x,
             y:player.y,
+            width:player.width,
+            height:player.height,
             name:player.name,
         });
     }
@@ -147,24 +177,33 @@ Player.updates = function(){
 // -----------------------------------------------------------------------------
 // 탄환
 // -----------------------------------------------------------------------------
-var Bullet = function(angle){
-    var self = Entity();
-    self.id = Math.random();
+var Bullet = function(owner,angle){
+    var self        = Entity();
+    self.id         = Math.random();
+    self.width      = 10,
+    self.height     = 10,
     self.moveSpeedX = Math.cos(angle/180*Math.PI) * 10;
     self.moveSpeedY = Math.sin(angle/180*Math.PI) * 10;
-
-    self.lifeTime = 100;
-    self.toRemove = false;
+    self.owner      = owner;
+    self.lifeTime   = 30;
+    self.toRemove   = false;
 
     var supper_update = self.update;
     self.update = function() {
         if( self.lifeTime-- <= 0) {
             self.toRemove = true;
         }
-        if( self.ToRemove ) {
+        supper_update();
+
+        for( var i in Player.list ) {
+            var player = Player.list[i];
+            if( self.owner !== player && self.testCollision(player) ) {
+                self.toRemove = true;
+            }
+        }
+        if( self.toRemove ) {
             delete Bullet.list[self.id];
         }
-        supper_update();
     }
     Bullet.list[self.id] = self;
     return self;
@@ -179,6 +218,8 @@ Bullet.updates = function() {
         pack.push({
             x:bullet.x,
             y:bullet.y,
+            width:bullet.width,
+            height:bullet.height,
         });
     }
     return pack;
