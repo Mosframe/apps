@@ -240,6 +240,15 @@ var Player = function(id) {
         }
     }
     Player.list[id] = self;
+
+    createPack.player.push({
+        id      : self.id,
+        x       : self.x,
+        y       : self.y,
+        width   : self.width,
+        height  : self.height,
+        name    : self.name,
+    });
     return self;
 }
 // 플레이어 리스트 생성
@@ -267,6 +276,7 @@ Player.onConnect = function(socket) {
 // 접속종료 이벤트
 Player.onDisconnect = function(socket) {
     delete Player.list[socket.id];
+    removePack.player.push(socket.id);
 }
 // 플레이어 리스트 갱신
 Player.updates = function(){
@@ -276,13 +286,10 @@ Player.updates = function(){
         var player = Player.list[playerId];
         player.update();
 
-        // TODO : 패킷 최적화가 필요함, 변경되지 않는 사이즈값은 생성시에만 전송한다.
         pack.push({
-            x:player.x,
-            y:player.y,
-            width:player.width,
-            height:player.height,
-            name:player.name,
+            id  : player.id,
+            x   : player.x,
+            y   : player.y,
         });
     }
     return pack;
@@ -315,11 +322,15 @@ var Bullet = function(owner,angle){
                 self.toRemove = true;
             }
         }
-        if( self.toRemove ) {
-            delete Bullet.list[self.id];
-        }
     }
     Bullet.list[self.id] = self;
+    createPack.bullet.push({
+        id      : self.id,
+        x       : self.x,
+        y       : self.y,
+        width   : self.width,
+        height  : self.height,
+    });
     return self;
 }
 Bullet.list = {};
@@ -329,25 +340,30 @@ Bullet.updates = function() {
     for( var bulletId in Bullet.list ) {
         var bullet = Bullet.list[bulletId];
         bullet.update();
-
-        // TODO : 패킷 최적화가 필요함, 변경되지 않는 사이즈값은 생성시에만 전송한다.
-        pack.push({
-            x:bullet.x,
-            y:bullet.y,
-            width:bullet.width,
-            height:bullet.height,
-        });
+        if( bullet.toRemove ) {
+            delete Bullet.list[bulletId];
+            removePack.bullet.push(bullet.id);
+        } else
+            pack.push({
+                id  : bullet.id,
+                x   : bullet.x,
+                y   : bullet.y,
+            });
     }
     return pack;
 }
 
 // -----------------------------------------------------------------------------
 
+var createPack  = {player:[],bullet:[]};
+var removePack  = {player:[],bullet:[]};
+
+
 // 서버 틱 업데이트 : 25fps
 setInterval( function(){
 
-    // 모든 엔티티들 갱신
-    var pack = {
+    // 모든 엔티티들 갱신하고 변경된 패킷들을 리턴한다.
+    var updatePack = {
         player:Player.updates(),
         bullet:Bullet.updates(),
     }
@@ -355,6 +371,15 @@ setInterval( function(){
     // 모든 클라이언트들에게 패키지 데이터를 보낸다.
     for( var socketId in sockets ) {
         var socket = sockets[socketId];
-        socket.emit( 'newPositions', pack );
+        socket.emit( 'create'   , createPack );
+        socket.emit( 'update'   , updatePack );
+        socket.emit( 'remove'   , removePack );
     }
+
+    // 보내진 모든 팩들은 초기화 한다.
+    createPack.player   = [];
+    createPack.bullet   = [];
+    removePack.player   = [];
+    removePack.bullet   = [];
+
 },1000/25);

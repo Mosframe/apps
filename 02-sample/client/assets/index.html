@@ -32,6 +32,7 @@ var socket = io();
 
 // -----------------------------------------------------------------------------
 // 로그인 로직
+// -----------------------------------------------------------------------------
 var signDiv         = document.getElementById('signDiv'         ); //
 var signDivUsername = document.getElementById('signDivUsername' ); //
 var signDivPassword = document.getElementById('signDivPassword' ); //
@@ -79,53 +80,22 @@ socket.on('resSignUp',function(data){
 });
 
 // -----------------------------------------------------------------------------
-// 게임 로직
-var ctx         = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍스트
+// 채팅 로직
+// -----------------------------------------------------------------------------
 var chatText    = document.getElementById('chatText'   ); // 채팅 출력 문자열
 var chatForm    = document.getElementById('chatForm'   ); // 채팅 입력 폼
 var chatInput   = document.getElementById('chatInput'  ); // 채팅 입력 입력창
 
-ctx.font = '20px Arial';
-
-// -----------------------------------------------------------------------------
-// 서버로 부터 데이터를 수신한다.
-socket.on('newPositions',function(data){
-    ctx.clearRect(0,0,500,500);
-
-    ctx.save();
-    ctx.fillStyle = 'green';
-    for( var c=0; c<data.player.length; ++c ) {
-        var player = data.player[c];
-        ctx.fillRect(player.x-player.width/2, player.y-player.height/2, player.width, player.height );
-    }
-    ctx.fillStyle   = 'yellow';
-    ctx.textAlign   = 'center';
-    ctx.textBaseline= 'middle';
-    for( var c=0; c<data.player.length; ++c ) {
-        var player = data.player[c];
-        ctx.fillText(player.name,player.x,player.y);
-    }
-    ctx.fillStyle = 'red';
-    for( var c=0; c<data.bullet.length; ++c ) {
-        bullet = data.bullet[c];
-        ctx.fillRect(bullet.x-bullet.width/2, bullet.y-bullet.height/2, bullet.width, bullet.height );
-    }
-    ctx.restore();
-});
-
-// -----------------------------------------------------------------------------
 // 채팅 메시지를 채팅메시지 리스트에 추가한다.
 socket.on('addChat',function(data){
     chatText.innerHTML += `<div>${data}</div>`;
 });
 
-// -----------------------------------------------------------------------------
 // 서버로 부터 eval 결과를 수신 받는다.
 socket.on('resEval',function(data){
     console.log(data);
 });
 
-// -----------------------------------------------------------------------------
 // 서버에 채팅 메시지를 전송한다.
 chatForm.onsubmit = function(e) {
     e.preventDefault(); // 이벤트 전파(상위에 테그들에 전달)를 막지 않고 이벤트 실행 취소
@@ -137,6 +107,117 @@ chatForm.onsubmit = function(e) {
         socket.emit( 'sendChat', chatInput.value );
     chatInput.value = '';
 }
+
+
+// -----------------------------------------------------------------------------
+// 게임 로직
+// -----------------------------------------------------------------------------
+var ctx = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍스트
+ctx.font = '20px Arial';
+
+// -----------------------------------------------------------------------------
+// entity
+var Entity = function(createPack) {
+    var self    = {};
+    self.id     = createPack.id;
+    self.x      = createPack.x;
+    self.y      = createPack.y;
+    self.width  = createPack.width;
+    self.height = createPack.height;
+    return self;
+}
+
+// -----------------------------------------------------------------------------
+// player
+var Player = function(createPack) {
+    var self    = Entity(createPack);
+    self.name   = createPack.name;
+    Player.list[self.id] = self;
+    return self;
+}
+Player.list = {};
+
+// -----------------------------------------------------------------------------
+// bullet
+var Bullet = function(createPack) {
+    var self    = Entity(createPack);
+    Bullet.list[self.id] = self;
+    return self;
+}
+Bullet.list = {};
+
+// create entities
+socket.on('create', function(data) {
+    //{player:[{id:user01,name:'user01',x:0,y:0,...]},bullet:[...]}
+    for( var c=0; c<data.player.length; ++c ) {
+        new Player(data.player[c]);
+    }
+    for( var c=0; c<data.bullet.length; ++c ) {
+        new Bullet(data.bullet[c]);
+    }
+});
+
+// update entities
+socket.on('update', function(data) {
+    //{plyer:[{id:user01,x:0,y:0}],bullet:[...]}
+    for( var c=0; c<data.player.length; ++c ) {
+        var pack = data.player[c];
+        var player = Player.list[pack.id];
+        if(player) {
+            if(pack.x !== undefined )
+                player.x = pack.x;
+            if(pack.y !== undefined )
+                player.y = pack.y;
+        }
+    }
+    for( var c=0; c<data.bullet.length; ++c ) {
+        var pack = data.bullet[c];
+        var bullet = Bullet.list[pack.id];
+        if(bullet) {
+            if(pack.x !== undefined )
+                bullet.x = pack.x;
+            if(pack.y !== undefined )
+                bullet.y = pack.y;
+        }
+    }
+});
+
+// remove entities
+socket.on('remove', function(data) {
+    //{player:[123,456],bullet:[123,1111]}
+    for( var c=0; c<data.player.length; ++c ) {
+        delete Player.list[data.player[c]];
+    }
+    for( var c=0; c<data.bullet.length; ++c ) {
+        delete Bullet.list[data.bullet[c]];
+    }
+});
+
+// -----------------------------------------------------------------------------
+// tick update & draw
+setInterval( function() {
+    ctx.clearRect(0,0,500,500);
+
+    ctx.save();
+    ctx.fillStyle = 'green';
+    for( var c in Player.list ) {
+        var player = Player.list[c];
+        ctx.fillRect(player.x-player.width/2, player.y-player.height/2, player.width, player.height );
+    }
+    ctx.fillStyle   = 'yellow';
+    ctx.textAlign   = 'center';
+    ctx.textBaseline= 'middle';
+    for( var c in Player.list ) {
+        var player = Player.list[c];
+        ctx.fillText(player.name,player.x,player.y);
+    }
+    ctx.fillStyle = 'red';
+    for( var c in Bullet.list ) {
+        var bullet = Bullet.list[c];
+        ctx.fillRect(bullet.x-bullet.width/2, bullet.y-bullet.height/2, bullet.width, bullet.height );
+    }
+    ctx.restore();
+},40);
 
 
 // -----------------------------------------------------------------------------

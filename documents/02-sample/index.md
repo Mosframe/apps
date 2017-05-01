@@ -35,3 +35,4 @@
 025. 원격 DB를 시뮬레이션하도록 메모리DB 접근 함수들 비동기함수로 수정
 026. [원격 DB 설치 ( Database > NoSQL > DocumentType > MongoDB )](./026.md)
 027. 원격 DB를 이용해 회원가입 및 로그인 로직 변경
+028. 향후 오브젝트 확장될 것을 고려하여 객체를 (create,update,remove)로 분리하여 처리함
