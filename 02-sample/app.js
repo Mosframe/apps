@@ -41,23 +41,22 @@ io.sockets.on('connection', function(socket){
 
     // 로그인
     socket.on('reqSignIn',function(data){
-        var success = false;
-        if( isValidPassword(data) ) {
-            // 플레이어 생성 및 등록
-            Player.onConnect(socket);
-            socket.player = Player.list[socket.id];
-            success = true;
-        }
-        socket.emit('resSignIn', {success:success} );
+        isValidPassword( data, function(res) {
+            var success = false;
+            if( res ) {
+                // 플레이어 생성 및 등록
+                Player.onConnect(socket);
+                socket.player = Player.list[socket.id];
+                success = true;
+            }
+            socket.emit('resSignIn', {success:success} );
+        });
     });
     // 회원가입
     socket.on('reqSignUp',function(data){
-        var success = false;
-        if( !getMember(data) ) {
-            addMember(data);
-            success = true;
-        }
-        socket.emit('resSignUp', {success:success} );
+        addMember(data,function(res){
+            socket.emit('resSignUp', {success:res} );
+        });
     });
     // 채팅 입력 처리
     socket.on('sendChat',function(data){
@@ -93,14 +92,30 @@ var members = {
     "test04":"1234",
     "test05":"1234",
 }
-var isValidPassword = function(data) {
-    return members[data.username] === data.password;
+var isValidPassword = function( data, callback ) {
+    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
+    setTimeout(function(){
+        callback( members[data.username] === data.password );
+    },10);
 };
-var getMember = function(data) {
-    return members[data.username];
+var getMember = function( data, callback ) {
+    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
+    setTimeout(function(){
+        callback( members[data.username] );
+    },10);
 };
-var addMember = function(data) {
-    return members[data.username] = data.password;
+var addMember = function( data, callback ) {
+    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
+    setTimeout(function(){
+        getMember( data, function(res){
+            if( res ) {
+                callback( false );
+            } else {
+                members[data.username] = data.password;
+                callback( true );
+            }
+        });
+    },10);
 };
 
 
