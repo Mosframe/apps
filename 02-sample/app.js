@@ -30,6 +30,65 @@ console.log('server started');
 var sockets = {};
 
 // -----------------------------------------------------------------------------
+// Socket.io를 통해 WebSocket 서비스를 시작한다.
+// -----------------------------------------------------------------------------
+var io = require('socket.io')(server,{});
+io.sockets.on('connection', function(socket){
+    console.log('socket connection : '+ socket.id );
+
+    // 소켓을 소켓DB에 등록한다.
+    sockets[socket.id] = socket;
+
+    // 로그인
+    socket.on('reqLogin',function(data){
+        var success = false;
+        if( isValidPassword(data) ) {
+            // 플레이어 생성 및 등록
+            Player.onConnect(socket);
+            socket.player = Player.list[socket.id];
+            success = true;
+        }
+        socket.emit('resLogin', {success:success} );
+    });
+    // 채팅 입력 처리
+    socket.on('sendChat',function(data){
+        var playerName = socket.player.name;
+        for( var i in sockets ) {
+            sockets[i].emit('addChat', playerName + ' : ' + data );
+        }
+    });
+    // 명령 실행
+    // TODO : 서버 해킹(데이터베이스를 조작하거나 삭제하는등...)이 가능할 수 있으므로 아무에게나 허용되지 않도록 서비스 전에 반드시 삭제하거나 관리자만 허용되도록 개선해야 한다.
+    socket.on('reqEval',function(data){
+        if( !DEBUG ) return;
+
+        var res = eval(data); // eval() 자바스크립트 코드를 계산하고 실행한다. (https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/eval)
+        socket.emit('resEval', res );
+    });
+    // 접속종료 처리
+    socket.on('disconnect',function(){
+        delete sockets[socket.id];
+        Player.onDisconnect(socket);
+    });
+});
+
+// -----------------------------------------------------------------------------
+// 회원정보 데이터
+// -----------------------------------------------------------------------------
+var members = {
+    //username:password
+    "mosframe":"1234",
+    "test01":"1234",
+    "test02":"1234",
+    "test03":"1234",
+    "test04":"1234",
+    "test05":"1234",
+}
+var isValidPassword = function(data) {
+    return members[data.username] === data.password;
+};
+
+// -----------------------------------------------------------------------------
 // 엔티티
 // -----------------------------------------------------------------------------
 var Entity = function() {
@@ -238,51 +297,6 @@ Bullet.updates = function() {
     }
     return pack;
 }
-
-
-// -----------------------------------------------------------------------------
-
-// Socket.io를 통해 WebSocket 서비스를 시작한다.
-var io = require('socket.io')(server,{});
-io.sockets.on('connection', function(socket){
-    console.log('socket connection : '+ socket.id );
-    // 소켓을 소켓DB에 등록한다.
-    sockets[socket.id] = socket;
-
-    // 로그인
-    socket.on('reqLogin',function(data){
-        var success = false;
-        if( data.username === 'mosframe' && data.password === '1234' ) {
-            // 플레이어 생성 및 등록
-            Player.onConnect(socket);
-            socket.player = Player.list[socket.id];
-            success = true;
-        }
-        socket.emit('resLogin', {success:success} );
-    });
-
-
-    // 채팅 입력 처리
-    socket.on('sendChat',function(data){
-        var playerName = socket.player.name;
-        for( var i in sockets ) {
-            sockets[i].emit('addChat', playerName + ' : ' + data );
-        }
-    });
-    // 명령 실행
-    // TODO : 서버 해킹(데이터베이스를 조작하거나 삭제하는등...)이 가능할 수 있으므로 아무에게나 허용되지 않도록 서비스 전에 반드시 삭제하거나 관리자만 허용되도록 개선해야 한다.
-    socket.on('reqEval',function(data){
-        if( !DEBUG ) return;
-
-        var res = eval(data); // eval() 자바스크립트 코드를 계산하고 실행한다. (https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/eval)
-        socket.emit('resEval', res );
-    });
-    // 접속종료 처리
-    socket.on('disconnect',function(){
-        delete sockets[socket.id];
-        Player.onDisconnect(socket);
-    });
-});
 
 // -----------------------------------------------------------------------------
 
