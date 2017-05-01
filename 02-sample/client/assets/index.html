@@ -110,13 +110,19 @@ document.onkeyup = function( event ) {
 // -----------------------------------------------------------------------------
 // 마우스 좌클릭 다운 이벤트
 document.onmousedown = function( event ) {
-    socket.emit( 'keyPress', {inputId:'attack',state:true})
+    if(event.which === 1 )
+        socket.emit( 'keyPress', {inputId:'attack',state:true});
+    else
+        socket.emit( 'keyPress', {inputId:'specialAttack',state:true});
 }
 
 // -----------------------------------------------------------------------------
 // 마우스 좌클릭 업 이벤트
 document.onmouseup = function( event ) {
-    socket.emit( 'keyPress', {inputId:'attack',state:false})
+    if(event.which === 1 )
+        socket.emit( 'keyPress', {inputId:'attack',state:false});
+    else
+        socket.emit( 'keyPress', {inputId:'specialAttack',state:false});
 }
 
 // -----------------------------------------------------------------------------
@@ -128,5 +134,10 @@ document.onmousemove = function( event ) {
     socket.emit( 'keyPress', {inputId:'attackAngle',state:angle})
 }
 
+// -----------------------------------------------------------------------------
+// 마우스 우클릭 이벤트
+document.oncontextmenu = function( mouse ) {
+    mouse.preventDefault(); // 컨텍스트 메뉴를 제거한다.
+}
 
 </script>

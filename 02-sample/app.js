@@ -81,16 +81,17 @@ var Entity = function() {
 // 플레이어
 // -----------------------------------------------------------------------------
 var Player = function(id) {
-    var self            = Entity();
-    self.id             = id;
-    self.name           = "" + Math.floor(10*Math.random());
-    self.pressingLeft   = false;
-    self.pressingRight  = false;
-    self.pressingUp     = false;
-    self.pressingDown   = false;
-    self.pressingAttack = false;
-    self.attackAngle    = 0;
-    self.moveSpeedMax   = 10;
+    var self                    = Entity();
+    self.id                     = id;
+    self.name                   = "" + Math.floor(10*Math.random());
+    self.pressingLeft           = false;
+    self.pressingRight          = false;
+    self.pressingUp             = false;
+    self.pressingDown           = false;
+    self.pressingAttack         = false;
+    self.pressingSpecialAttack  = false;
+    self.attackAngle            = 0;
+    self.moveSpeedMax           = 10;
 
     // 갱신
     var super_update = self.update;
@@ -101,6 +102,13 @@ var Player = function(id) {
         // 탄환 생성
         if( self.pressingAttack ) {
             self.shootBullet( self.attackAngle )
+        }
+        // 특수 탄환 생성
+        if( self.pressingSpecialAttack ) {
+            // 7발 발사
+            for( var c=-3; c<4; ++c ) {
+                self.shootBullet( c*10 + self.attackAngle )
+            }
         }
     }
 
@@ -143,12 +151,13 @@ Player.onConnect = function(socket) {
     socket.on('keyPress',function(data){
         //console.log(data.inputId);
         switch( data.inputId ) {
-        case 'left'         : player.pressingLeft   = data.state; break;
-        case 'right'        : player.pressingRight  = data.state; break;
-        case 'up'           : player.pressingUp     = data.state; break;
-        case 'down'         : player.pressingDown   = data.state; break;
-        case 'attack'       : player.pressingAttack = data.state; break;
-        case 'attackAngle'  : player.attackAngle    = data.state; break;
+        case 'left'         : player.pressingLeft           = data.state; break;
+        case 'right'        : player.pressingRight          = data.state; break;
+        case 'up'           : player.pressingUp             = data.state; break;
+        case 'down'         : player.pressingDown           = data.state; break;
+        case 'attack'       : player.pressingAttack         = data.state; break;
+        case 'specialAttack': player.pressingSpecialAttack  = data.state; break;
+        case 'attackAngle'  : player.attackAngle            = data.state; break;
         }
     });
 }
