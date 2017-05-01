@@ -75,7 +75,7 @@ chatForm.onsubmit = function(e) {
 // -----------------------------------------------------------------------------
 // 키보드 키 다운 이벤트
 document.onkeydown = function( event ) {
-    //console.log(evnet.keyCode);
+    console.log(event.keyCode);
     // 자바스크립트 키코드 표 : http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
     if( event.keyCode === 68 ) {        // d
         socket.emit('keyPress',{ inputId:'right',state:true });
@@ -101,4 +101,27 @@ document.onkeyup = function( event ) {
         socket.emit('keyPress',{ inputId:'up',state:false });
     }
 }
+
+// -----------------------------------------------------------------------------
+// 마우스 좌클릭 다운 이벤트
+document.onmousedown = function( event ) {
+    socket.emit( 'keyPress', {inputId:'attack',state:true})
+}
+
+// -----------------------------------------------------------------------------
+// 마우스 좌클릭 업 이벤트
+document.onmouseup = function( event ) {
+    socket.emit( 'keyPress', {inputId:'attack',state:false})
+}
+
+// -----------------------------------------------------------------------------
+// 마우스 좌표 이동 이벤트
+document.onmousemove = function( event ) {
+    var x = -250 + event.clientX - 8;
+    var y = -250 + event.clientY - 8;
+    var angle = Math.atan2(y,x) / Math.PI * 180; // atan2(y,x) : x축에 대한 좌표의 각도를 라디안값으로 얻는다. ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2 )
+    socket.emit( 'keyPress', {inputId:'attackAngle',state:angle})
+}
+
+
 </script>
