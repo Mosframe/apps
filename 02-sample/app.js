@@ -185,6 +185,8 @@ var Entity = function() {
 var Player = function(id) {
     var self                    = Entity();
     self.id                     = id;
+    self.x                      = Math.random() * (500-100) + 50;
+    self.y                      = Math.random() * (500-100) + 50;
     self.name                   = "" + Math.floor(10*Math.random());
     self.pressingLeft           = false;
     self.pressingRight          = false;
@@ -194,6 +196,9 @@ var Player = function(id) {
     self.pressingSpecialAttack  = false;
     self.attackAngle            = 0;
     self.moveSpeedMax           = 10;
+    self.hp                     = 10;
+    self.hpMax                  = 10;
+    self.score                  = 0;
 
     // 갱신
     var super_update = self.update;
@@ -203,22 +208,23 @@ var Player = function(id) {
 
         // 탄환 생성
         if( self.pressingAttack ) {
-            self.shootBullet( self.attackAngle )
+            self.shootBullet( self.attackAngle, 30 )
         }
         // 특수 탄환 생성
         if( self.pressingSpecialAttack ) {
             // 7발 발사
             for( var c=-3; c<4; ++c ) {
-                self.shootBullet( c*10 + self.attackAngle )
+                self.shootBullet( c*10 + self.attackAngle, 10 )
             }
         }
     }
 
     // 총알 발사
-    self.shootBullet = function(angle) {
+    self.shootBullet = function(angle,lifeTime) {
         var bullet = Bullet( self, angle );
         bullet.x = self.x;
         bullet.y = self.y;
+        bullet.lifeTime = lifeTime;
     }
 
     // 이동속도 갱신
@@ -248,14 +254,19 @@ var Player = function(id) {
             width   : self.width,
             height  : self.height,
             name    : self.name,
+            hp      : self.hp,
+            hpMax   : self.hpMax,
+            score   : self.score,
         };
     }
     // 갱신 패킷 얻기
     self.getUpdatePack = function() {
         return  {
-            id  : self.id,
-            x   : self.x,
-            y   : self.y,
+            id      : self.id,
+            x       : self.x,
+            y       : self.y,
+            hp      : self.hp,
+            score   : self.score,
         }
     }
     Player.list[id] = self;
@@ -340,6 +351,14 @@ var Bullet = function(owner,angle){
         for( var i in Player.list ) {
             var player = Player.list[i];
             if( self.owner !== player && self.testCollision(player) ) {
+                player.hp -= 1;
+                if( player.hp <= 0 ) {
+                    player.hp = player.hpMax;
+                    player.x = Math.random() * (500-100) + 50;
+                    player.y = Math.random() * (500-100) + 50;
+
+                    if( self.owner ) self.owner.score += 1;
+                }
                 self.toRemove = true;
             }
         }
