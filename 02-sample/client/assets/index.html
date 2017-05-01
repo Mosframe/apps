@@ -48,6 +48,9 @@ signDivSignIn.onclick = function() {
 }
 // 로그인 > 인증 결과
 socket.on('resSignIn',function(data){
+    if( data.err ) {
+        console.error( data.err );
+    }
     if( data.success ) {
         signDiv.style.display = 'none';
         gameDiv.style.display = 'inline-block';
@@ -65,6 +68,9 @@ signDivSignUp.onclick = function() {
 }
 // 회원가입 > 결과
 socket.on('resSignUp',function(data){
+    if( data.err ) {
+        console.error( data.err );
+    }
     if( data.success ) {
         alert("회원가입 성공!");
     } else {

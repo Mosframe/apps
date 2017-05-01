@@ -4,6 +4,10 @@
 
 var DEBUG = true;
 
+// db커넥션 생성
+var mongojs = require('mongojs');
+var db = mongojs('localhost:27017/Unicon',['account','progress']);
+
 // express 생성
 var express = require('express');
 var app = express();
@@ -41,7 +45,7 @@ io.sockets.on('connection', function(socket){
 
     // 로그인
     socket.on('reqSignIn',function(data){
-        isValidPassword( data, function(res) {
+        isValidPassword( data, function(err,res) {
             var success = false;
             if( res ) {
                 // 플레이어 생성 및 등록
@@ -49,13 +53,13 @@ io.sockets.on('connection', function(socket){
                 socket.player = Player.list[socket.id];
                 success = true;
             }
-            socket.emit('resSignIn', {success:success} );
+            socket.emit('resSignIn', {err:err,success:success} );
         });
     });
     // 회원가입
     socket.on('reqSignUp',function(data){
-        addMember(data,function(res){
-            socket.emit('resSignUp', {success:res} );
+        addMember(data,function(err,res){
+            socket.emit('resSignUp', {err:err,success:res} );
         });
     });
     // 채팅 입력 처리
@@ -81,41 +85,49 @@ io.sockets.on('connection', function(socket){
 });
 
 // -----------------------------------------------------------------------------
-// 회원정보 데이터
+// 데이터베이스
 // -----------------------------------------------------------------------------
-var members = {
-    //username:password
-    "mosframe":"1234",
-    "test01":"1234",
-    "test02":"1234",
-    "test03":"1234",
-    "test04":"1234",
-    "test05":"1234",
-}
+// 비밀번호가 일치하는가?
 var isValidPassword = function( data, callback ) {
-    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
-    setTimeout(function(){
-        callback( members[data.username] === data.password );
-    },10);
+    db.account.find({username:data.username,password:data.password},function(err,res){
+        var success = false;
+        if( err )
+            console.error( err );
+        else
+            if( res.length > 0 )
+                success = true;
+        callback( err, success );
+    });
 };
-var getMember = function( data, callback ) {
-    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
-    setTimeout(function(){
-        callback( members[data.username] );
-    },10);
+// 회원이 맞는가?
+var isMember = function( data, callback ) {
+    db.account.find({username:data.username},function(err,res){
+        var success = false;
+        if( err )
+            console.error( err );
+        else
+            if( res.length > 0 )
+                 success = true;
+        callback( err, success );
+    });
 };
+// 회원 등록
 var addMember = function( data, callback ) {
-    // 데이터베이스 요청/응답 지연시간를 비동기처리로 시뮬레이션 한다.
-    setTimeout(function(){
-        getMember( data, function(res){
-            if( res ) {
-                callback( false );
-            } else {
-                members[data.username] = data.password;
-                callback( true );
-            }
-        });
-    },10);
+    // 이미 등록된 회원이 있는가?
+    isMember( data, function(err,res) {
+        if( res )
+            callback( err, false );
+        else {
+            db.account.insert({username:data.username,password:data.password},function(err) {
+                var success = false;
+                if( err )
+                    console.error( err );
+                else
+                    success = true;
+                callback( err, success );
+            });
+        }
+    });
 };
 
 
