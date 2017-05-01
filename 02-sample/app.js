@@ -47,7 +47,7 @@ io.sockets.on('connection', function(socket){
     socket.on('reqSignIn',function(data){
         isValidPassword( data, function(err,res) {
             var success = false;
-            if( res ) {
+            if( res || DEBUG ) {
                 // 플레이어 생성 및 등록
                 Player.onConnect(socket);
                 socket.player = Player.list[socket.id];
@@ -187,6 +187,8 @@ var Player = function(id) {
     self.id                     = id;
     self.x                      = Math.random() * (500-100) + 50;
     self.y                      = Math.random() * (500-100) + 50;
+    self.width                  = 18*2,
+    self.height                 = 25*2,
     self.name                   = "" + Math.floor(10*Math.random());
     self.pressingLeft           = false;
     self.pressingRight          = false;
@@ -332,8 +334,8 @@ Player.updates = function(){
 var Bullet = function(owner,angle){
     var self        = Entity();
     self.id         = Math.random();
-    self.width      = 10,
-    self.height     = 10,
+    self.width      = 20,
+    self.height     = 20,
     self.moveSpeedX = Math.cos(angle/180*Math.PI) * 10;
     self.moveSpeedY = Math.sin(angle/180*Math.PI) * 10;
     self.owner      = owner;

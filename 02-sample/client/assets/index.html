@@ -116,6 +116,16 @@ var ctx = document.getElementById("ctx").getContext("2d"); // 캔버스 컨텍�
 ctx.font = '20px Arial';
 
 // -----------------------------------------------------------------------------
+// 그래픽 리소스들
+var images = {};
+images.player   = new Image();
+images.player.src   = "./client/images/player.png";
+images.bullet   = new Image();
+images.bullet.src   = "./client/images/bullet.png";
+images.map   = new Image();
+images.map.src      = "./client/images/map.png";
+
+// -----------------------------------------------------------------------------
 // entity
 var Entity = function(createPack) {
     var self    = {};
@@ -137,20 +147,21 @@ var Player = function(createPack) {
     self.score  = createPack.score;
 
     self.drawBody = function() {
-        ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        ctx.drawImage( images.player, self.x-self.width/2, self.y-self.height/2, self.width, self.height );
     }
 
     self.drawHp = function() {
         var width = 30 * self.hp / self.hpMax;
-        ctx.fillRect(self.x-width/2,self.y-17, width, 5 );
+        ctx.fillRect(self.x-width/2,self.y-self.width-14, width, 5 );
     }
 
     self.drawName = function() {
-        ctx.fillText(self.name,self.x,self.y);
+        //ctx.fillText(self.name,self.x,self.y);
     }
 
     self.drawScore = function() {
-        ctx.fillText(self.score,self.x,self.y-25);
+        var imageHeight = images.player.height;
+        ctx.fillText( self.score, self.x, self.y-self.height-15 );
     }
 
     Player.list[self.id] = self;
@@ -164,13 +175,23 @@ var Bullet = function(createPack) {
     var self    = Entity(createPack);
 
     self.draw = function() {
-        ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        //ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        ctx.drawImage( images.bullet, self.x-self.width/2, self.y-self.height/2, self.width, self.height );
     }
 
     Bullet.list[self.id] = self;
     return self;
 }
 Bullet.list = {};
+
+// -----------------------------------------------------------------------------
+// map
+var drawMap = function() {
+    ctx.drawImage(images.map,-500,-300);
+}
+
+// -----------------------------------------------------------------------------
+// socket
 
 // create entities
 socket.on('create', function(data) {
@@ -228,6 +249,8 @@ socket.on('remove', function(data) {
 setInterval( function() {
     ctx.clearRect(0,0,500,500);
 
+    drawMap();
+
     ctx.save();
     ctx.fillStyle = 'green';
     for( var c in Player.list ) {
@@ -245,7 +268,7 @@ setInterval( function() {
     for( var c in Player.list ) {
         Player.list[c].drawName();
     }
-    ctx.font = '12px Arial';
+    ctx.font = '16px Arial';
     ctx.fillStyle   = 'blue';
     for( var c in Player.list ) {
         Player.list[c].drawScore();
