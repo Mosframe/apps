@@ -2,10 +2,11 @@
 
 
 <!-- 로그인 & 회원가입 -->
-<div id="loginDiv">
-    Username: <input id="loginDivUsername" type="text"></input><br>
-    Password: <input id="loginDivPassword" type="password"></input><br>
-    <button id="loginDivloginIn">login In</button>
+<div id="signDiv">
+    Username: <input id="signDivUsername" type="text"></input><br>
+    Password: <input id="signDivPassword" type="password"></input><br>
+    <button id="signDivSignIn">Sign In</button><br>
+    <button id="signDivSignUp">Sign Up</button><br>
 </div>
 
 <!-- 게임뷰 : 초기엔 display를 꺼놓는다.-->
@@ -31,26 +32,43 @@ var socket = io();
 
 // -----------------------------------------------------------------------------
 // 로그인 로직
-var loginDiv            = document.getElementById('loginDiv'        ); //
-var loginDivUsername    = document.getElementById('loginDivUsername'); //
-var loginDivPassword    = document.getElementById('loginDivPassword'); //
-var loginDivloginIn     = document.getElementById('loginDivloginIn' ); //
+var signDiv         = document.getElementById('signDiv'         ); //
+var signDivUsername = document.getElementById('signDivUsername' ); //
+var signDivPassword = document.getElementById('signDivPassword' ); //
+var signDivSignIn   = document.getElementById('signDivSignIn'   ); //
+var signDivSignUp   = document.getElementById('signDivSignUp'   ); //
+
 
 // 로그인
-loginDivloginIn.onclick = function() {
-    socket.emit('reqLogin',{
-        username : loginDivUsername.value,
-        password : loginDivPassword.value,
+signDivSignIn.onclick = function() {
+    socket.emit('reqSignIn',{
+        username : signDivUsername.value,
+        password : signDivPassword.value,
     });
 }
-
 // 로그인 > 인증 결과
-socket.on('resLogin',function(data){
+socket.on('resSignIn',function(data){
     if( data.success ) {
-        loginDiv.style.display = 'none';
+        signDiv.style.display = 'none';
         gameDiv.style.display = 'inline-block';
     } else {
         alert("로그인 실패!");
+    }
+});
+
+// 회원가입
+signDivSignUp.onclick = function() {
+    socket.emit('reqSignUp',{
+        username : signDivUsername.value,
+        password : signDivPassword.value,
+    });
+}
+// 회원가입 > 결과
+socket.on('resSignUp',function(data){
+    if( data.success ) {
+        alert("회원가입 성공!");
+    } else {
+        alert("회원가입 실패!");
     }
 });
 

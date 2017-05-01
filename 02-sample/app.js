@@ -40,7 +40,7 @@ io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
 
     // 로그인
-    socket.on('reqLogin',function(data){
+    socket.on('reqSignIn',function(data){
         var success = false;
         if( isValidPassword(data) ) {
             // 플레이어 생성 및 등록
@@ -48,7 +48,16 @@ io.sockets.on('connection', function(socket){
             socket.player = Player.list[socket.id];
             success = true;
         }
-        socket.emit('resLogin', {success:success} );
+        socket.emit('resSignIn', {success:success} );
+    });
+    // 회원가입
+    socket.on('reqSignUp',function(data){
+        var success = false;
+        if( !getMember(data) ) {
+            addMember(data);
+            success = true;
+        }
+        socket.emit('resSignUp', {success:success} );
     });
     // 채팅 입력 처리
     socket.on('sendChat',function(data){
@@ -87,6 +96,13 @@ var members = {
 var isValidPassword = function(data) {
     return members[data.username] === data.password;
 };
+var getMember = function(data) {
+    return members[data.username];
+};
+var addMember = function(data) {
+    return members[data.username] = data.password;
+};
+
 
 // -----------------------------------------------------------------------------
 // 엔티티
