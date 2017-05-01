@@ -56,10 +56,12 @@ var Player = function(id) {
     var self            = Entity();
     self.id             = id;
     self.name           = "" + Math.floor(10*Math.random());
-    self.pressingDown   = false;
-    self.pressingUp     = false;
     self.pressingLeft   = false;
     self.pressingRight  = false;
+    self.pressingUp     = false;
+    self.pressingDown   = false;
+    self.pressingAttack = false;
+    self.attackAngle    = 0;
     self.moveSpeedMax   = 10;
 
     // 갱신
@@ -67,6 +69,18 @@ var Player = function(id) {
     self.update = function() {
         self.updateMoveSpeed();
         super_update();
+
+        // 탄환 생성
+        if( self.pressingAttack ) {
+            self.shootBullet( self.attackAngle )
+        }
+    }
+
+    // 총알 발사
+    self.shootBullet = function(angle) {
+        var bullet = Bullet( angle );
+        bullet.x = self.x;
+        bullet.y = self.y;
     }
 
     // 이동속도 갱신
@@ -97,12 +111,16 @@ Player.onConnect = function(socket) {
     // 플레이어 생성 > 등록
     var player = Player(socket.id);
 
+    // 플레이어 입력 처리
     socket.on('keyPress',function(data){
+        //console.log(data.inputId);
         switch( data.inputId ) {
-        case 'left' : player.pressingLeft   = data.state; break;
-        case 'right': player.pressingRight  = data.state; break;
-        case 'up'   : player.pressingUp     = data.state; break;
-        case 'down' : player.pressingDown   = data.state; break;
+        case 'left'         : player.pressingLeft   = data.state; break;
+        case 'right'        : player.pressingRight  = data.state; break;
+        case 'up'           : player.pressingUp     = data.state; break;
+        case 'down'         : player.pressingDown   = data.state; break;
+        case 'attack'       : player.pressingAttack = data.state; break;
+        case 'attackAngle'  : player.attackAngle    = data.state; break;
         }
     });
 }
@@ -153,12 +171,6 @@ var Bullet = function(angle){
 }
 Bullet.list = {};
 Bullet.updates = function() {
-
-    // 무작위로 탄환 생성
-    if( Math.random() < 0.1 ) {
-        Bullet( Math.random()*360 );
-    }
-
     var pack = [];
     // 모든 플레이어들의 각자 변경된 위치정보를 갱신하고 패키지에 담는다.
     for( var bulletId in Bullet.list ) {
@@ -183,7 +195,7 @@ io.sockets.on('connection', function(socket){
     sockets[socket.id] = socket;
     // 플레이어 생성 및 등록
     Player.onConnect(socket);
-    socket.player = Player(socket.id);
+    socket.player = Player.list[socket.id];
     // 채팅 입력 처리
     socket.on('sendChat',function(data){
         var playerName = socket.player.name;
