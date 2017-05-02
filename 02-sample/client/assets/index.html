@@ -27,6 +27,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
 <script>
 
+var WIDTH   = 500;
+var HEIGHT  = 500;
+
 // 서버에 접속한다.
 var socket = io();
 
@@ -122,7 +125,7 @@ images.player   = new Image();
 images.player.src   = "./client/images/player.png";
 images.bullet   = new Image();
 images.bullet.src   = "./client/images/bullet.png";
-images.map   = new Image();
+images.map      = new Image();
 images.map.src      = "./client/images/map.png";
 
 // -----------------------------------------------------------------------------
@@ -134,6 +137,17 @@ var Entity = function(createPack) {
     self.y      = createPack.y;
     self.width  = createPack.width;
     self.height = createPack.height;
+
+    // 현재 프레임에서만 유효한 캐시 변수들
+    self.cx     = self.x; // 현재좌표(x)
+    self.cy     = self.y; // 현재좌표(y)
+
+    self.update = function() {
+        // 플레이어 기준 좌표로 변환
+        self.cx = self.x - myPlayer.x + WIDTH/2;
+        self.cy = self.y - myPlayer.y + HEIGHT/2;
+    }
+
     return self;
 }
 
@@ -147,53 +161,80 @@ var Player = function(createPack) {
     self.score  = createPack.score;
 
     self.drawBody = function() {
-        ctx.drawImage( images.player, self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        ctx.drawImage( images.player,
+            0,0,images.player.width,images.player.height,
+            self.cx-self.width/2, self.cy-self.height/2, self.width, self.height );
     }
 
     self.drawHp = function() {
         var width = 30 * self.hp / self.hpMax;
-        ctx.fillRect(self.x-width/2,self.y-self.width-14, width, 5 );
+        ctx.fillRect(self.cx-width/2,self.cy-self.height/2-10, width, 5 );
     }
 
     self.drawName = function() {
-        //ctx.fillText(self.name,self.x,self.y);
+        ctx.fillText(self.name,self.cx,self.cy);
     }
 
     self.drawScore = function() {
-        var imageHeight = images.player.height;
-        ctx.fillText( self.score, self.x, self.y-self.height-15 );
+        ctx.fillText( self.score, self.cx, self.cy-self.height/2-20 );
     }
 
     Player.list[self.id] = self;
     return self;
 }
 Player.list = {};
+Player.updates = function() {
+    for( var c in Player.list ) {
+        Player.list[c].update();
+    }
+}
 
 // -----------------------------------------------------------------------------
 // bullet
 var Bullet = function(createPack) {
-    var self    = Entity(createPack);
+    var self = Entity(createPack);
 
     self.draw = function() {
-        //ctx.fillRect(self.x-self.width/2, self.y-self.height/2, self.width, self.height );
-        ctx.drawImage( images.bullet, self.x-self.width/2, self.y-self.height/2, self.width, self.height );
+        ctx.drawImage( images.bullet,
+            0, 0, images.bullet.width, images.bullet.height,
+            self.cx-self.width/2, self.cy-self.height/2, self.width, self.height );
     }
 
     Bullet.list[self.id] = self;
     return self;
 }
 Bullet.list = {};
+Bullet.updates = function() {
+    for( var c in Bullet.list ) {
+        Bullet.list[c].update();
+    }
+}
+
 
 // -----------------------------------------------------------------------------
 // map
 var drawMap = function() {
-    ctx.drawImage(images.map,-500,-300);
+    var x = WIDTH/2 - myPlayer.x;
+    var y = HEIGHT/2 - myPlayer.y;
+
+    ctx.drawImage(images.map,x,y);
+}
+
+// -----------------------------------------------------------------------------
+// UI
+var drawScore = function() {
+    ctx.font        = '20px Arial';
+    ctx.fillStyle   = 'white';
+    ctx.textAlign   = 'left';
+    ctx.textBaseline= 'middle';
+    ctx.fillText("SCORE : "+myPlayer.score,0,20);
 }
 
 // -----------------------------------------------------------------------------
 // socket
 
 // create entities
+var myPlayer = null;
 socket.on('create', function(data) {
     //{players:[{id:user01,name:'user01',x:0,y:0,...]},bullets:[...]}
     for( var c=0; c<data.players.length; ++c ) {
@@ -201,6 +242,14 @@ socket.on('create', function(data) {
     }
     for( var c=0; c<data.bullets.length; ++c ) {
         new Bullet(data.bullets[c]);
+    }
+
+    // 매번 리스트를 변경하므로 myPlayer를 재설정이 필요하다.
+    if( data.myId ) {
+        myId = data.myId;
+        myPlayer = Player.list[data.myId];
+    } else if( myPlayer ) {
+        myPlayer = Player.list[myPlayer.id];
     }
 });
 
@@ -245,22 +294,30 @@ socket.on('remove', function(data) {
 });
 
 // -----------------------------------------------------------------------------
-// tick update & draw
-setInterval( function() {
+// update & rendering
+
+// updates
+updates = function() {
+    Player.updates();
+    Bullet.updates();
+}
+// rendering
+rendering = function() {
+    ctx.save();
+
     ctx.clearRect(0,0,500,500);
 
     drawMap();
 
-    ctx.save();
     ctx.fillStyle = 'green';
     for( var c in Player.list ) {
         Player.list[c].drawBody();
     }
-    ctx.save();
     ctx.fillStyle = 'red';
     for( var c in Player.list ) {
         Player.list[c].drawHp();
     }
+    /*
     ctx.font = '20px Arial';
     ctx.fillStyle   = 'yellow';
     ctx.textAlign   = 'center';
@@ -273,18 +330,29 @@ setInterval( function() {
     for( var c in Player.list ) {
         Player.list[c].drawScore();
     }
+    */
     ctx.fillStyle = 'purple';
     for( var c in Bullet.list ) {
         Bullet.list[c].draw();
     }
+
+    drawScore();
+
     ctx.restore();
+}
+
+// tick
+setInterval( function() {
+    if( !myPlayer ) return;
+    updates();
+    rendering();
 },40);
 
 
 // -----------------------------------------------------------------------------
 // 키보드 키 다운 이벤트
 document.onkeydown = function( event ) {
-    console.log(event.keyCode);
+    //console.log(event.keyCode);
     // 자바스크립트 키코드 표 : http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
     if( event.keyCode === 68 ) {        // d
         socket.emit('keyPress',{ inputId:'right',state:true });

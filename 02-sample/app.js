@@ -298,6 +298,7 @@ Player.onConnect = function(socket) {
 
     // 서버에 존재하는 엔티티 정보들을 클라이언트에 모두 전송해 준다.
     socket.emit('create',{
+        myId:socket.id,
         players:Player.getCreatePacks(),
         bullets:Bullet.getCreatePacks(),
     });
