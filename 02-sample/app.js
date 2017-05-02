@@ -91,7 +91,7 @@ io.sockets.on('connection', function(socket){
 // -----------------------------------------------------------------------------
 // 비밀번호가 일치하는가?
 var isValidPassword = function( data, callback ) {
-    return db(null,true);
+    return callback(null,true);
     /*
     db.account.find({username:data.username,password:data.password},function(err,res){
         var success = false;
@@ -106,7 +106,7 @@ var isValidPassword = function( data, callback ) {
 };
 // 회원이 맞는가?
 var isMember = function( data, callback ) {
-    return db(null,false);
+    return callback(null,false);
     /*
     db.account.find({username:data.username},function(err,res){
         var success = false;
@@ -121,7 +121,7 @@ var isMember = function( data, callback ) {
 };
 // 회원 등록
 var addMember = function( data, callback ) {
-    return db(null,false);
+    return callback(null,false);
     /*
     // 이미 등록된 회원이 있는가?
     isMember( data, function(err,res) {
