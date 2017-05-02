@@ -6,7 +6,7 @@ var DEBUG = true;
 
 // db커넥션 생성
 var mongojs = require('mongojs');
-var db = mongojs('localhost:27017/Unicon',['account','progress']);
+var db = null; //mongojs('localhost:27017/Unicon',['account','progress']);
 
 // express 생성
 var express = require('express');
@@ -29,8 +29,10 @@ app.get('/', function( req, res ) {
 app.use('/client', express.static(__dirname + '/client/assets/'));
 
 // Http서버에서 2000 포트를 통해서 클라이언트 요청을 받는다.
-server.listen(2000);
+//server.listen(2000);
+server.listen(process.env.PORT || 2000);
 console.log('server started');
+
 var sockets = {};
 
 // -----------------------------------------------------------------------------
@@ -47,7 +49,7 @@ io.sockets.on('connection', function(socket){
     socket.on('reqSignIn',function(data){
         isValidPassword( data, function(err,res) {
             var success = false;
-            if( res || DEBUG ) {
+            if( res ) {
                 // 플레이어 생성 및 등록
                 Player.onConnect(socket);
                 socket.player = Player.list[socket.id];
@@ -89,6 +91,8 @@ io.sockets.on('connection', function(socket){
 // -----------------------------------------------------------------------------
 // 비밀번호가 일치하는가?
 var isValidPassword = function( data, callback ) {
+    return db(null,true);
+    /*
     db.account.find({username:data.username,password:data.password},function(err,res){
         var success = false;
         if( err )
@@ -98,9 +102,12 @@ var isValidPassword = function( data, callback ) {
                 success = true;
         callback( err, success );
     });
+    */
 };
 // 회원이 맞는가?
 var isMember = function( data, callback ) {
+    return db(null,false);
+    /*
     db.account.find({username:data.username},function(err,res){
         var success = false;
         if( err )
@@ -110,9 +117,12 @@ var isMember = function( data, callback ) {
                  success = true;
         callback( err, success );
     });
+    */
 };
 // 회원 등록
 var addMember = function( data, callback ) {
+    return db(null,false);
+    /*
     // 이미 등록된 회원이 있는가?
     isMember( data, function(err,res) {
         if( res )
@@ -128,6 +138,7 @@ var addMember = function( data, callback ) {
             });
         }
     });
+    */
 };
 
 
