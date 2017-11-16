@@ -4,9 +4,6 @@
 
 var DEBUG = true;
 
-// db커넥션 생성
-var mongojs = require('mongojs');
-var db = null; //mongojs('localhost:27017/Unicon',['account','progress']);
 
 // express 생성
 var express = require('express');
@@ -14,9 +11,6 @@ var app = express();
 
 // http 서버 생성
 var server = require('http').Server(app);
-
-// util
-var util = require('./util');
 
 // 홈 서비스 : http://mywebsite:2000 => http://mywebsite:2000/client/assets/index.html
 app.get('/', function( req, res ) {
