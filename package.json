@@ -1,0 +1,24 @@
+{
+  "name": "mosframe.apps",
+  "version": "0.1.0",
+  "description": "Mosframe App Builds",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.15.2",
+    "mongojs": "^2.4.0",
+    "socket.io": "^1.7.3"
+  },
+  "engines":{
+      "node": "7.7.x"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./02-sample/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mosframe/apps.git"
+  },
+  "author": "mosframe",
+  "license": "ISC"
+}
