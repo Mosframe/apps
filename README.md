@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #소개
 유저들의 고유한 아이콘을 캐릭터 활용한 MMO 슈팅 게임을 만들어 본다.
 
@@ -25,3 +26,7 @@ npm install --save typescript // 타입스크립트
 #참고자료들
 - [README Guidline](https://www.visualstudio.com/en-us/docs/git/create-a-readme)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
+=======
+# apps
+빌드된 프로젝트들
+>>>>>>> 597280e29b55665021934660a16facced428cc13
