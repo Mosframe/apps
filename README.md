@@ -1,5 +1,4 @@
 #소개
 - 빌드된 프로젝트들
 
-# BulletTime
-- 슬로우 모션을 테스트하는 프로젝트
+- [프로젝트들 소개](./apps/client/assets/Documents/README.md)
