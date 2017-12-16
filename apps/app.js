@@ -37,7 +37,7 @@ app.use('/client/Documents', function( req, res ){
 // 서버소스를 보호하기 위해 /client/assets 디렉토리 이하만 클라이언트에 서비스한다.
 // http://mywebsite:2000/client => http://mywebsite:2000/client/assets
 // ex) /server/secureFile.js 파일은 클라이언트에 노출되지 않는다.
-app.use('/client', express.static(__dirname + '/client/assets/'));
+app.use('/', express.static(__dirname + '/client/assets/'));
 
 
 
