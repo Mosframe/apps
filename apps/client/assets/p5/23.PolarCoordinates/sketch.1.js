@@ -13,17 +13,6 @@
 // 변수, 오브젝트 정의
 // -----------------------------------------------------------------
 
-var p;
-
-Particle.prototype.show = function() {
-    point(this.x,this.y);
-}
-
-p5.Vector.prototype.double = function() {
-    this.x *= 2;
-    this.y *= 2;
-    this.z *= 2;
-}
 
 // -----------------------------------------------------------------
 // p5.js 함수들
@@ -31,32 +20,32 @@ p5.Vector.prototype.double = function() {
 
 function setup () {
 
-    createCanvas(600, 300);
-
-    p = new Particle();
-
-    v = createVector(3,4);
-
+    createCanvas(400, 400);
+    angleMode(DEGREES);
 }
 
 function draw () {
 
     background(51);
 
-    p.show();
+    var x = 100;
+    var y = 300;
+    stroke(255);
+    strokeWeight(8);
+    point(x,y);
+
+    var angle = map(mouseX,0,width,-90,90);
+    var r = 100;
+
+    var dx = r * cos(angle);
+    var dy = r * sin(angle);
+
+    point(x+dx, y+dy);
+    line(x,y,x+dx,y+dy);
+
 }
 
 // -----------------------------------------------------------------
 // 사용자 정의 함수들
 // -----------------------------------------------------------------
 
-
-function Particle () {
-
-    this.x = 100;
-    this.y = 99;
-
-    //this.show = function() {
-    //    point(this.x, this.y);
-    //}
-}
