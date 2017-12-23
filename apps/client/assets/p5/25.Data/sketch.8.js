@@ -4,9 +4,8 @@
  *
  * p5.js 레퍼런스: http://p5js.org/reference
  * 웹기술 레퍼런스: http://developer.mozilla.org
- * 뉴욕타임즈 API : http://developer.nytimes.com/
- * Sample APIKey : 99cfea65a5bb30650b3d31eb1713233e:15:73386102
- * 나의 APIKey : a61370c0e15d44e9ac6d1a35e055f9f1
+ * Giphy API : https://developers.giphy.com
+ * 나의 APIKey : XrRE36VxdPjrssxJgkuT9KDW92rUIKtD
  *
  * @author : https://github.com/Mosframe
  */
@@ -15,9 +14,12 @@
 // -----------------------------------------------------------------
 // 변수, 오브젝트 정의
 // -----------------------------------------------------------------
-var url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=';
-url += 'porcupine';
-url += '&api-key=a61370c0e15d44e9ac6d1a35e055f9f1';
+var api     = 'api.giphy.com';
+var path    = '/v1/gifs/search';
+var query   = 'rainbow';
+var apiKey  = 'XrRE36VxdPjrssxJgkuT9KDW92rUIKtD';
+
+var url = `http://${api}${path}?q=${query}&api_key=${apiKey}`;
 
 // -----------------------------------------------------------------
 // p5.js 함수들
@@ -42,14 +44,12 @@ function draw () {
 // 사용자 정의 함수들
 // -----------------------------------------------------------------
 
-function gotData ( data ) {
+function gotData ( giphy ) {
 
-    console.log(data);
-    console.log(data.response.docs[1].headline.main);
+    console.log(giphy);
+    console.log(giphy.data[0].images.original.url);
 
-    var articles = data.response.docs;
-    for( var i=0; i<articles.length; ++i) {
-        createElement('h1',articles[i].headline.main);
-        createP(articles[i].snippet);
+    for( var i=0; i<giphy.data.length; ++i ) {
+        createImg(giphy.data[i].images.original.url);
     }
 }

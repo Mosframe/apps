@@ -4,9 +4,6 @@
  *
  * p5.js 레퍼런스: http://p5js.org/reference
  * 웹기술 레퍼런스: http://developer.mozilla.org
- * 뉴욕타임즈 API : http://developer.nytimes.com/
- * Sample APIKey : 99cfea65a5bb30650b3d31eb1713233e:15:73386102
- * 나의 APIKey : a61370c0e15d44e9ac6d1a35e055f9f1
  *
  * @author : https://github.com/Mosframe
  */
@@ -15,9 +12,8 @@
 // -----------------------------------------------------------------
 // 변수, 오브젝트 정의
 // -----------------------------------------------------------------
-var url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=';
-url += 'porcupine';
-url += '&api-key=a61370c0e15d44e9ac6d1a35e055f9f1';
+var video;
+var vScale = 16;
 
 // -----------------------------------------------------------------
 // p5.js 함수들
@@ -25,31 +21,41 @@ url += '&api-key=a61370c0e15d44e9ac6d1a35e055f9f1';
 
 function setup () {
 
-    noCanvas();
-    //createCanvas(600, 400);
-
-    loadJSON( url, gotData );
-
+    createCanvas(640, 480);
+    pixelDensity(1);
+    video = createCapture(VIDEO);
+    video.size(width/vScale,height/vScale);
 }
 
 function draw () {
 
     background(51);
 
+    video.loadPixels();
+    loadPixels();
+
+    for( var y=0; y<video.height; ++y ) {
+        for( var x=0; x<video.width; ++x ) {
+
+            var index =(x + y*video.width)*4;
+
+            var r = video.pixels[index+0];
+            var g = video.pixels[index+1];
+            var b = video.pixels[index+2];
+
+            // 흑백 픽셀
+
+            var bright = (r+g+b)/3;
+
+            // 픽셀라이즈
+
+            fill(bright);
+            rect(x*vScale,y*vScale,vScale,vScale);
+        }
+    }
 }
 
 // -----------------------------------------------------------------
 // 사용자 정의 함수들
 // -----------------------------------------------------------------
 
-function gotData ( data ) {
-
-    console.log(data);
-    console.log(data.response.docs[1].headline.main);
-
-    var articles = data.response.docs;
-    for( var i=0; i<articles.length; ++i) {
-        createElement('h1',articles[i].headline.main);
-        createP(articles[i].snippet);
-    }
-}
