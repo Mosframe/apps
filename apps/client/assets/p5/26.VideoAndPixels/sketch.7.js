@@ -14,7 +14,7 @@
 // -----------------------------------------------------------------
 var video;
 var vScale = 16;
-var slider;
+var alphaSlider;
 
 var cols = 40;
 var rows = 30;
@@ -31,7 +31,7 @@ function setup () {
     video.size(cols,rows);
 
     createP("");
-    slider = createSlider(0,255, 77);
+    alphaSlider = createSlider(0,255, 77);
 }
 
 
@@ -58,7 +58,7 @@ function draw () {
 
             var bright = (r+g+b)/3;
 
-            var threshold = slider.value();
+            var threshold = alphaSlider.value();
 
             if( bright > threshold ) {
                 fill(255);
