@@ -1,13 +1,18 @@
 {
   "name": "mosframe.apps",
   "version": "0.1.0",
-  "description": "Mosframe App Builds",
+  "description": "mosframe test projects",
   "main": "app.js",
   "dependencies": {
+    "canvas": "^1.6.9",
     "express": "^4.15.2",
+    "jsdom": "^11.5.1",
     "markdown": "^0.5.0",
     "mongojs": "^2.4.0",
-    "socket.io": "^1.7.3"
+    "processing-js": "^1.6.6",
+    "socket.io": "^1.7.3",
+    "twit": "^2.2.9",
+    "xmlhttprequest": "^1.8.0"
   },
   "engines": {
     "node": "7.7.x"
@@ -20,6 +25,11 @@
     "type": "git",
     "url": "https://github.com/Mosframe/apps.git"
   },
+  "keywords": [
+    "sockets",
+    "p5.js",
+    "node"
+  ],
   "author": "mosframe",
   "license": "ISC"
 }

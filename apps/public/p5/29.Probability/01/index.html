@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
+
+    <script src="../../libs/p5/p5.min.js"></script>
+    <script src="../../libs/p5/p5.dom.min.js"></script>
+    <script src="../../libs/p5/p5.sound.min.js"></script>
+    <script src="sketch.js"></script>
+
+    <style>
+      body {
+        padding: 20px;
+        margin: 0;
+      }
+      #entrants {
+        background-color: #CCC;
+        padding: 2px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <p>
+      <h1>Probability</h1>
+      <h2><a href="http://hamiltonmusical.com/lottery/">Hamilton Lottery</a> Simulator</h2>
+      <h3>...</h3>
+    </p>
+    <p>이 시뮬레이터는 매회 <span id='buyTicket'>0</span>장의 티켓을 구입할 수 있고, <span id='entrants' contenteditable>50000</span>명이 추첨에 참여 합니다.</p>
+    <p>그러므로 <span id='chance'>5,000</span>번 이상 참여하면 1번 정도 당첨 될 수 있습니다.</p>
+    <p>또한 당신이 99% 확률로 당첨이 되려면 최대 약 <span id='win99Num'>23,000</span>회 까지 참여 해야 합니다.</p>
+    <p>
+      <button id='startButton'>추첨시작</button>
+    </p>
+    <p>
+      당신은 <span id="total">0</span>회 참여 했습니다.
+    </p>
+
+    <p id = "results"></p>
+
+    </body>
+
+</html>
