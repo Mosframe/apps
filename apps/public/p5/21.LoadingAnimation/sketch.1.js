@@ -33,7 +33,7 @@ function setup () {
     console.log( floor(millis()) + ' miliseconds' );
 
     for( var i=0; i<totalSongs; ++i ) {
-        rainbowSong( `rainbow${i+1}.mp3` );
+        rainbowSong( `../../sounds/rainbow${i+1}.mp3` );
     }
 }
 
