@@ -26,9 +26,10 @@ void setup () {
         float x = random(width);
         float y = random(height);
         float r = random(100,255);
+        float g = random(100,255);
         float b = random(100,255);
         noStroke();
-        fill(r,0,b, 100);
+        fill(r,g,b, 100);
         ellipse(x,y,16,16);
     }
 
