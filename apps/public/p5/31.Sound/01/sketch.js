@@ -41,7 +41,7 @@ function setup () {
     rateSlider      = createSlider( 0, 1.5, 1, 0.01 );
     panSlider       = createSlider( -1, 1, 0, 0.01 );
 
-    song = loadSound( '../../../sounds/music/Music-01.mp3', ()=>{
+    song = loadSound( '../../../sounds/Music/Music-01.mp3', ()=>{
 
         //song.play();
         createP('');

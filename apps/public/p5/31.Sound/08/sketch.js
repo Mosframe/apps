@@ -23,7 +23,7 @@ var w;
 
 function preload () {
 
-    song = loadSound( '../../../sounds/music/Music-01.mp3' );
+    song = loadSound( '../../../sounds/Music/Music-01.mp3' );
 }
 
 function setup () {
