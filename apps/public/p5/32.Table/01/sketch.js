@@ -11,15 +11,7 @@
 // -----------------------------------------------------------------
 // 변수, 오브젝트 정의
 // -----------------------------------------------------------------
-var song;
-var volumeSlider;
-var rateSlider;
-var panSlider;
-var playButton;
-var stopButton;
-var jumpButton;
-
-var amp;
+var table;
 
 // -----------------------------------------------------------------
 // p5.js 함수들
@@ -27,99 +19,50 @@ var amp;
 
 function preload () {
 
-    //song = loadSound('../../../sounds/rainbow1.mp3');
+    table = loadTable('data.csv', 'csv','header');
 }
 
 function setup () {
 
-    createCanvas(200,200);
+    createCanvas(600,400);
+    background(0);
 
-    //song.play();
+    // 로컬 데이터를 비주얼라이징
 
-    createP('');
-    volumeSlider    = createSlider( 0, 1, 0.1, 0.01 );
-    rateSlider      = createSlider( 0, 1.5, 1, 0.01 );
-    panSlider       = createSlider( -1, 1, 0, 0.01 );
+    /*
+    var s = "64,100,32,7,87,22";
+    var nums = split(s,",");
+    var vals = nums.map((i)=>{ return parseInt(i,10); });
 
-    song = loadSound( '../../../sounds/Music/Music-01.mp3', ()=>{
+    for( var i=0; i<nums.length; ++i ){
 
-        //song.play();
-        createP('');
-        playButton = createButton('play');
-        playButton.mousePressed(()=>{
-            if( song.isPlaying() ) {
-                song.pause();
-                playButton.html('play');
-            } else {
-                song.play();
-                playButton.html('pause');
-            }
-        });
+        fill(255,127);
+        stroke(255);
+        ellipse(50+i*100,200, vals[i], vals[i]);
+    }
+    */
 
-        stopButton = createButton('stop');
-        stopButton.mousePressed(()=>{
-            song.stop();
-            playButton.html('play');
-        });
+    // 테이블 데이터를 비주얼라이징
 
-        jumpButton = createButton('jump');
-        jumpButton.mousePressed(()=>{
+    var row = table.getRow(0);
+    //console.log(row);
 
-            var len = song.duration();
-            //song.jump(len/2);
-            var t = random(len);
-            console.log(t+'/'+len);
+    var x = row.getNum('x');
+    var y = row.getNum('y');
+    var w = row.getNum('width');
+    var h = row.getNum('height');
 
-            song.jump(t);
-        });
+    rect(x,y,w,h);
 
-    });
-
-    amp = new p5.Amplitude();
 }
 
 
 function draw () {
 
-    //background(random(255));
 
-    song.setVolume( volumeSlider.value() );
-    song.rate( rateSlider.value() );
-    song.pan( panSlider.value() );
-
-    //console.log( song.currentTime() );
-
-
-    // 에니메이션
-    // background( (song.currentTime() * 50)%255, 0, 255);
-
-    // 트리거
-    //if( song.currentTime() > 5 ) {
-    //    background(255,0,255);
-    //}
-
-    // 트리거
-    //song.addCue(5, ()=>{
-    //    background( random(255), random(255), random(255) );
-    //});
-
-    // 트리거
-    song.addCue(2, changeBackground, color( 0, 0, random(255) ) );
-    song.addCue(4, changeBackground, color( 0, random(255), 0 ) );
-    song.addCue(6, changeBackground, color( random(255), 0, 0 ) );
-
-    var vol = amp.getLevel();
-    var diam = map( vol, 0, 0.3, 10, 200 );
-
-    fill(255,0,255);
-    ellipse( width/2, height/2, diam, diam );
 }
 
 // -----------------------------------------------------------------
 // 사용자 정의 함수들
 // -----------------------------------------------------------------
 
-
-function changeBackground(color) {
-    background( color );
-}
