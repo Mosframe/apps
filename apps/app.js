@@ -10,6 +10,18 @@ var express = require('express');
 var app     = express();
 var server  = require('http').Server(app);
 
+/*
+// CORS 설정
+//var cors    = require('cors');
+//app.use(cors());
+app.all('/*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    console.log(req.url);
+    next();
+});
+*/
+
 // MarkDown 서비스
 
 var fs = require('fs');

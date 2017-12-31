@@ -26,14 +26,19 @@ function preload () {
 
 function setup () {
 
+    createButton(0).mousePressed(()=>{step=0});
+    createButton(1).mousePressed(()=>{step=1});
+    createButton(2).mousePressed(()=>{step=2});
+    createButton(3).mousePressed(()=>{step=3});
+    createButton(4).mousePressed(()=>{step=4});
+    createButton(5).mousePressed(()=>{step=5});
+    createButton(6).mousePressed(()=>{step=6});
+    createButton(7).mousePressed(()=>{step=7});
+    createP('');
+
     createCanvas(originalImg.width,originalImg.height);
 
     background(0);
-}
-
-function mousePressed () {
-
-    ++step;
 }
 
 function draw () {
@@ -60,7 +65,6 @@ function draw0 () {
 }
 
 function draw1 () {
-
 
     loadPixels();
     originalImg.loadPixels();
