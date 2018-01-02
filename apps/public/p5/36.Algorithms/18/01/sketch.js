@@ -21,10 +21,23 @@ var changing = true;
 var xScaleSlider;
 var yScaleSlider;
 var maxIterationsSlider;
+var caSlider;
+var cbSlider;
+var aniCheckbox;
+var basicCheckbox;
 
 var xScale          = 2.5;
 var yScale          = 2.5;
-var maxIterations   = 1000;
+var maxIterations   = 100;
+var angle = 0;
+var ca = 0;
+var cb = 0;
+
+var basic       = true;
+var ani         = true;
+var useColor    = false;
+
+
 
 // ...
 
@@ -37,6 +50,8 @@ function preload () {
 
     createElement('h1','Julia Set : 줄리아 집합');
     createA('https://en.wikipedia.org/wiki/Julia_set','Julia set wiki');
+    createDiv('');
+    createA('http://paulbourke.net/fractals/juliaset/','Julia Set Fractal (2D)');
     createDiv('');
     createDiv('기본 프레임워크 구현');
 
@@ -61,9 +76,85 @@ function preload () {
         yScale = yScaleSlider.value();
     });
     createSpan('maxIterations:');
-    maxIterationsSlider = createSlider( 2, 2000, 1000, 1 ).touchMoved( ()=>{
+    maxIterationsSlider = createSlider( 2, 2000, 100, 1 ).touchMoved( ()=>{
         maxIterations = maxIterationsSlider.value();
     });
+    createSpan('ca:');
+    caSlider = createSlider( -1, 1, -0.70176, 0.001 ).touchMoved( ()=>{
+        ca = caSlider.value();
+    });
+    createSpan('cb:');
+    cbSlider = createSlider( -1, 1, -0.3842, 0.001 ).touchMoved( ()=>{
+        cb = cbSlider.value();
+    });
+    basicCheckbox = createCheckbox( 'basic', false ).changed( ()=>{
+        basic = basicCheckbox.checked();
+    });
+    aniCheckbox = createCheckbox( 'ani', false ).changed( ()=>{
+        ani = aniCheckbox.checked();
+    });
+    useColorCheckbox = createCheckbox( 'useColor', false ).changed( ()=>{
+        useColor = useColorCheckbox.checked();
+        if( useColor ) {
+            colorMode(HSB,255);
+        } else {
+            colorMode(RGB,255);
+        }
+    });
+    createButton('-0.70176, -0.3842').mousePressed( ()=>{
+
+        ca = -0.70176;
+        cb = -0.3842;
+        ani = false;
+
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        aniCheckbox.checked(ani);
+    });
+    createButton('0, 0.8').mousePressed( ()=>{
+
+        ca = 0;
+        cb = 0.8;
+        ani = false;
+
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        aniCheckbox.checked(ani);
+    });
+    createButton('0.8, 0').mousePressed( ()=>{
+
+        ca = 0.8;
+        cb = 0;
+        ani = false;
+
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        aniCheckbox.checked(ani);
+    });
+    createButton('-0.8, 0').mousePressed( ()=>{
+
+        ca = -0.8;
+        cb = 0;
+        ani = false;
+
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        aniCheckbox.checked(ani);
+    });
+    createButton('-0.8, 0.156').mousePressed( ()=>{
+
+        ca = -0.8;
+        cb = 0.156;
+        ani = false;
+
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        aniCheckbox.checked(ani);
+    });
+
+
+
+
 
     // ...
 
@@ -81,7 +172,16 @@ function draw () {
 
     // ...
 
-    //background(255,0,0);
+    background(255);
+
+    // 에니메이션
+    if( ani ) {
+        ca = cos(angle*3.213);
+        cb = sin(angle);
+        caSlider.value(ca);
+        cbSlider.value(cb);
+        angle += 0.02;
+    }
 
     loadPixels();
     for( var x=0; x<width; ++x ) {
@@ -90,12 +190,16 @@ function draw () {
             var a = map( x, 0, width , -xScale, xScale );
             var b = map( y, 0, height, -yScale, yScale );
 
-            var ca = a;
-            var cb = b;
+            // Mandelbrot Set 기본
+            if( basic ) {
+                ca = a;
+                cb = b;
+            }
 
             var n = 0;
 
             while( n < maxIterations ) {
+
                 var aa = a * a - b * b;
                 var bb = 2 * a * b;
 
@@ -118,11 +222,22 @@ function draw () {
                 bright = 0;
             }
 
-            var pix = (x+y*width) * 4;
-            pixels[pix+0] = bright;
-            pixels[pix+1] = bright;
-            pixels[pix+2] = bright;
-            pixels[pix+3] = 255;
+            if( useColor ) {
+
+                var pixelColor = color(bright,255,255,255);
+
+                var pix = (x+y*width) * 4;
+                pixels[pix+0] = pixelColor.levels[0];
+                pixels[pix+1] = pixelColor.levels[1];
+                pixels[pix+2] = pixelColor.levels[2];
+                pixels[pix+3] = pixelColor.levels[3];
+            } else {
+                var pix = (x+y*width) * 4;
+                pixels[pix+0] = bright;
+                pixels[pix+1] = bright;
+                pixels[pix+2] = bright;
+                pixels[pix+3] = 255;
+            }
         }
     }
     updatePixels();
@@ -156,9 +271,21 @@ function reset () {
 
     // ...
 
-    xScale        = xScale = xScaleSlider.value();
-    yScale        = yScale = yScaleSlider.value();
+    xScale          = xScaleSlider.value();
+    yScale          = yScaleSlider.value();
     maxIterations   = maxIterationsSlider.value();
+    ca              = caSlider.value();
+    cb              = cbSlider.value();
+    basic           = basicCheckbox.checked();
+    ani             = aniCheckbox.checked();
+    useColor        = useColorCheckbox.checked();
+
+    if( useColor ) {
+        colorMode(HSB,255);
+    } else {
+        colorMode(RGB,255);
+    }
+
 
     // ...
 

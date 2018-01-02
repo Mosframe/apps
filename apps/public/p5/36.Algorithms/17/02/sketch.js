@@ -156,8 +156,8 @@ function reset () {
 
     // ...
 
-    xScale        = xScale = xScaleSlider.value();
-    yScale        = yScale = yScaleSlider.value();
+    xScale          = xScaleSlider.value();
+    yScale          = yScaleSlider.value();
     maxIterations   = maxIterationsSlider.value();
 
     // ...
