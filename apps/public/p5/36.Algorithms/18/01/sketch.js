@@ -18,20 +18,22 @@ var changing = true;
 
 // ...
 
-var xScaleSlider;
-var yScaleSlider;
+var xOffsetSlider;
+var yOffsetSlider;
+var zoomInput;
 var maxIterationsSlider;
 var caSlider;
 var cbSlider;
 var aniCheckbox;
 var basicCheckbox;
 
-var xScale          = 2.5;
-var yScale          = 2.5;
+var zoom            = 5;
+var xOffset         = 0;
+var yOffset         = 0;
 var maxIterations   = 100;
-var angle = 0;
-var ca = 0;
-var cb = 0;
+var angle           = 0;
+var ca              = 0;
+var cb              = 0;
 
 var basic       = true;
 var ani         = true;
@@ -67,13 +69,17 @@ function preload () {
 
     // ...
 
-    createSpan('xScale:');
-    xScaleSlider = createSlider( 0.0, 10.0, 2.5, 0.01 ).touchMoved( ()=>{
-        xScale = xScaleSlider.value();
+    createSpan('xOffset:');
+    xOffsetSlider = createSlider( -1000, 1000, 0, 1 ).touchMoved( ()=>{
+        xOffset = xOffsetSlider.value();
     });
-    createSpan('yScale:');
-    yScaleSlider = createSlider( 0.0, 10.0, 2.5, 0.01 ).touchMoved( ()=>{
-        yScale = yScaleSlider.value();
+    createSpan('yOffset:');
+    yOffsetSlider = createSlider( -1000, 1000, 0, 1 ).touchMoved( ()=>{
+        yOffset = yOffsetSlider.value();
+    });
+    createSpan('zoom:');
+    zoomInput = createInput(zoom).input( ()=>{
+        zoom = Number(zoomInput.value());
     });
     createSpan('maxIterations:');
     maxIterationsSlider = createSlider( 2, 2000, 100, 1 ).touchMoved( ()=>{
@@ -183,12 +189,26 @@ function draw () {
         angle += 0.02;
     }
 
-    loadPixels();
-    for( var x=0; x<width; ++x ) {
-        for( var y=0; y<height; ++y ) {
+    // 가우스 평면에 다양한 범위를 설정하여 프랙탈에서 확대/축소를 한다.
 
-            var a = map( x, 0, width , -xScale, xScale );
-            var b = map( y, 0, height, -yScale, yScale );
+    var w       = zoom;
+    var h       = (w * height) / width;
+    var xmin    = -w/2;
+    var ymin    = -h/2;
+    var xmax    = xmin + w;
+    var ymax    = xmin + h;
+    var dx      = (xmax-xmin)/width;
+    var dy      = (ymax-ymin)/height;
+
+    loadPixels();
+
+    var i = xmin + (xOffset*dx);
+    for( var x=0; x<width; ++x, i += dx ) {
+        var j = ymin + (yOffset*dy);
+        for( var y=0; y<height; ++y, j += dy ) {
+
+            var a = i;
+            var b = j;
 
             // Mandelbrot Set 기본
             if( basic ) {
@@ -197,18 +217,20 @@ function draw () {
             }
 
             var n = 0;
-
             while( n < maxIterations ) {
 
-                var aa = a * a - b * b;
-                var bb = 2 * a * b;
+                var aa = a * a;
+                var bb = b * b;
 
-                a = aa + ca;
-                b = bb + cb;
+                // 무한루프방지 : a+b가 16보다 크면 중지
 
-                if( abs(a + b) > 16 ) {
+                if( aa + bb > 4.0 ) {
                     break;
                 }
+
+                var twoab = 2.0 * a * b;
+                a = aa - bb + ca;
+                b = twoab + cb;
 
                 ++n;
             }
@@ -271,8 +293,9 @@ function reset () {
 
     // ...
 
-    xScale          = xScaleSlider.value();
-    yScale          = yScaleSlider.value();
+    xOffset         = xOffsetSlider.value();
+    yOffset         = yOffsetSlider.value();
+    zoom            = Number(zoomInput.value());
     maxIterations   = maxIterationsSlider.value();
     ca              = caSlider.value();
     cb              = cbSlider.value();
