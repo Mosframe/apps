@@ -29,8 +29,6 @@ var mSlider;
 var edgeCountSlider;
 var aniCheckbox;
 
-var changing = true;
-
 
 var mode = 'Supershapes';
 
