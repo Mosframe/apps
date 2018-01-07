@@ -94,6 +94,81 @@ app.use('/p5/27.WebSocket/04', ( req, res, next ) => {
     next();
 });
 
+app.use('/p5/36.Algorithms/28/04', ( req, res, next ) => {
+
+    //console.log(req.url);
+
+    if( req.url == '/index.html') {
+
+        var blobs = [];
+
+        function Blob( id, x, y, r ) {
+            this.id = id;
+            this.x  = x;
+            this.y  = y;
+            this.r  = r;
+        }
+
+        setInterval( heartbeat, 33 );
+
+        function heartbeat () {
+            io.sockets.emit('heartbeat', blobs );
+        }
+
+        io.sockets.on('connection', (socket) => {
+
+            console.log('new connection: ' + socket.id);
+
+            socket.on('start', (data) => {
+
+                console.log(data);
+
+                var newPlayer = new Blob( socket.id, data.x, data.y );
+                blobs.push( newPlayer );
+
+                // socket.broadcast.emit('start',data);
+                // io.sockets.emit('start', data); // 에코 데이터
+                // io.clients[sessionID].send( socket.id, data );
+            });
+
+            socket.on('update', (data) => {
+
+                //console.log(data);
+
+                var blob;
+                for( var i=0; i<blobs.length; ++i ) {
+                    blob = blobs[i];
+                    if( blob.id == socket.id ) {
+                        break;
+                    }
+                }
+                if( blob ) {
+                    blob.x = data.x;
+                    blob.y = data.y;
+                    blob.r = data.r;
+
+                    // socket.broadcast.emit('update',data);
+                    // io.sockets.emit('update', data); // 에코 데이터
+                }
+
+            });
+
+            socket.on('disconnect', (data)=>{
+
+                for( var i=blobs.length-1; i>=0; --i ) {
+                    var blob = blobs[i];
+                    if( blob.id == socket.id ) {
+                        blobs.splice(i,1);
+                        break;
+                    }
+                }
+            });
+        });
+    }
+
+    next();
+});
+
 app.use('/p5/30.TwitterBot', ( req, res, next ) => {
 
     //console.log(req.url);
