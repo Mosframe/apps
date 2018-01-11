@@ -18,7 +18,7 @@ var is3DCheckbox;
 
 var is3D;
 var fps;
-var desc;
+var statusView;
 var changing = true;
 
 // ......
@@ -154,7 +154,7 @@ function draw () {
     // ......
 
     fps.html( 'fps : ' + floor(frameRate()) );
-    desc.html(`
+    statusView.html(`
     3D=${is3D}<br/>
     width=${width}<br/>
     height=${height}<br/>
@@ -221,8 +221,8 @@ function reset () {
     if( fps ) fps.remove();
     fps  = createDiv('');
 
-    if( desc ) desc.remove();
-    desc = createDiv(desc);
+    if( statusView ) statusView.remove();
+    statusView = createDiv(statusView);
 
     changing = false;
 }
