@@ -28,8 +28,9 @@ function description () {
 // -----------------------------------------------------------------
 // 프로젝트 전용 변수들
 // -----------------------------------------------------------------
-var srcTxt;
-var words;
+var textfield;
+var output;
+var submet;
 
 // -----------------------------------------------------------------
 // 사전 작업 ( preload )
@@ -37,16 +38,11 @@ var words;
 
 function awake () {
 
-    createButton('sin').mousePressed(()=>{
-        mode = 0;
-    });
-    createButton('noise').mousePressed(()=>{
-        mode = 1;
-    });
-
-    createP('seed: <input id="seed" value="test"</input><button id="submit">submit</button>');
-
-    srcTxt = loadStrings('source.txt');
+    createP(`
+    <textarea cols=50 rows=6 id="input">A rainbow is a meteorological phenomenon that is caused by reflection, refraction and dispersion of light in water droplets resulting in a spectrum of light appearing in the sky. It takes the form of a multicoloured arc. Rainbows caused by sunlight always appear in the section of sky directly opposite the sun.</textarea>
+    <p><button id="submit">submit</button></p>
+    <p id = "output"></p>
+    `);
 }
 
 // -----------------------------------------------------------------
@@ -62,15 +58,10 @@ function start () {
     // angleMode(DEGREES);
     removeCanvas();
 
-    srcTxt = join( srcTxt, '' );
-    words = splitTokens( srcTxt, ' ,!.?' ); // 단어 단위로 분리
-
-    var seed    = select('#seed');
-    var submit  = select('#submit');
-    submit.mousePressed( ()=>{
-        createP( seed.value() );
-        createP( srcTxt );
-    });
+    textfield   = select('#input');
+    output      = select('#output');
+    submit      = select('#submit');
+    submit.mousePressed( newText );
 }
 
 // -----------------------------------------------------------------
@@ -91,10 +82,37 @@ function render () {
     // colorMode(HSB);
     background( 0 );
 
-
-
 }
 
 // -----------------------------------------------------------------
 // 프로젝트 전용 함수들
 // -----------------------------------------------------------------
+
+
+function newText() {
+    var s = textfield.value();
+    //createP(s);
+
+    var words = s.split(/(\W+)/); // 단어를 분리 (스페이스바 포함)
+    //console.log(words);
+
+    for( var i=0; i<words.length; ++i ) {
+        var word = words[i];
+        var span = createSpan(word);
+        span.parent(output);
+
+        if( !/\W+/.test(word) ) { // 스페이스바 제외
+            //span.style( 'background-color',color(random(255), random(255), random(255)) );
+            span.mouseOver( highlight );
+        }
+    }
+}
+
+function highlight () {
+
+    console.log(this.html());
+
+    this.html('rainbow');
+    var c = color( random(255), random(255), random(255) );
+    this.style('background-color', c );
+}

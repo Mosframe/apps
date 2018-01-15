@@ -41,13 +41,6 @@ var words;
 
 function awake () {
 
-    createButton('sin').mousePressed(()=>{
-        mode = 0;
-    });
-    createButton('noise').mousePressed(()=>{
-        mode = 1;
-    });
-
     createP('seed: <input id="seed" value="test"</input><button id="submit">submit</button>');
 
     srcTxt = loadStrings('source.txt');

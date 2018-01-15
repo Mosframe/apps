@@ -48,7 +48,7 @@ function preload () {
     createA('https://www.gamedev.net/articles/programming/graphics/exploring-metaballs-and-isosurfaces-in-2d-r2556/','Exploring Metaballs and Isosurfaces in 2D');
     createDiv('');
     createDiv('비디오 데이터 결합');
-    createDiv('너무 느려서 테스트중단');
+    createDiv('중간에 함수를 수정해서 다시 테스트해야 한다.');
 
     createSpan('width:');
     widthSlider = createSlider( 100, 1000, 300, 10 ).changed( ()=>{
@@ -154,10 +154,13 @@ function draw () {
 
     for( var y=0; y<video.height; ++y ) {
 
-        var currColor = video.get(x, y);
-        var r1 = currColor[0];
-        var g1 = currColor[1];
-        var b1 = currColor[2];
+        //var currColor = video.get(x, y);
+
+        var index = (x+y*video.width)*4;
+
+        var r1 = video.pixels[index+0];
+        var g1 = video.pixels[index+1];
+        var b1 = video.pixels[index+2];
         var r2 = red  (trackColor);
         var g2 = green(trackColor);
         var b2 = blue (trackColor);
@@ -199,7 +202,16 @@ function draw () {
                 }
 
                 var hsb = color( sum, 255, 255 );
-                set( x, y, hsb );
+
+
+                //set( x, y, hsb ); // 느린함수
+                var index = (x+y*width)*4;
+
+                 pixels[index+0] = hsb.levels[0];
+                 pixels[index+1] = hsb.levels[1];
+                 pixels[index+2] = hsb.levels[2];
+                 pixels[index+3] = hsb.levels[3];
+
             }
         }
 
@@ -256,7 +268,7 @@ function reset () {
     colorMode(HSB);
 
     video = createCapture(VIDEO);
-    video.size(100,100);
+    video.size(250,250);
     video.hide();
     trackColor = color(255,0,0);
 

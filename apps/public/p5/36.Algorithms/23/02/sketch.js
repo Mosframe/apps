@@ -38,7 +38,7 @@ var explosionForceSlider;
 
 function preload () {
 
-    createElement('h1','Fireworks : 볼꽃(폭죽)');
+    createElement('h1','Fireworks : 불꽃(폭죽)');
     createDiv('');
     createDiv('파티클 수명관리 + 모션 블러 효과');
 
