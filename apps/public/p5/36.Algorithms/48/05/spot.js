@@ -8,7 +8,7 @@
 
 
 // -----------------------------------------------------------------
-// 지역
+// 지역 (타일)
 // -----------------------------------------------------------------
 class Spot {
 
@@ -75,11 +75,26 @@ class Spot {
 
     render (c) {
 
-        fill(c);
-        if( this.wall ) {
-            fill(0);
-        }
+        //fill(c);
+        noFill();
+        strokeWeight(1);
         stroke(0);
         rect(this.i*w,this.j*h,w-1,h-1);
+
+        // 벽 드로잉
+
+        if( this.wall ) {
+
+            // 원형 벽
+
+            fill(0);
+            noStroke();
+            ellipse(this.i*w+w/2,this.j*h+h/2,w*0.8,h*0.8);
+
+            // 박스형 벽
+
+            // stroke(0);
+            // rect(this.i*w,this.j*h,w-1,h-1);
+        }
     }
 }

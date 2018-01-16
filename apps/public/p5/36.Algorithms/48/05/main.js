@@ -14,7 +14,7 @@
 function description () {
 
     title       = 'A* Pathfinding Algorithm : A* 길찾기 알고리즘';
-    subTitle    = '최적화';
+    subTitle    = '원형 장애물';
 
     referUrls.push({
         text:'A* search algorithm',
@@ -22,8 +22,8 @@ function description () {
     });
 
 
-    defaultCanvasWidth  = 400;
-    defaultCanvasHeight = 400;
+    defaultCanvasWidth  = 800;
+    defaultCanvasHeight = 800;
 }
 
 // -----------------------------------------------------------------
@@ -36,8 +36,8 @@ var openSet     = [];
 var closedSet    = [];
 var start;
 var end;
-var w; // 스팟 가로스케일
-var h; // 스팟 세로스케일
+var w; // 타일 가로스케일
+var h; // 타일 세로스케일
 var path = [];
 var current;
 
@@ -212,13 +212,13 @@ function render () {
     // noLoop();
     // colorMode(HSB);
     // frameRate(5);
-    background( 0 );
+    background( 255 );
 
     // 모든 지역 드로잉
 
     for( var i=0; i<cols; ++i ) {
         for( var j=0; j<rows; ++j ) {
-            grid[i][j].render(color(255));
+            grid[i][j].render(color(100));
         }
     }
 
@@ -244,11 +244,22 @@ function render () {
         temp = temp.previous;
     }
 
-    // 패스 드로잉
+    // 패스 타일 드로잉
 
     for( var i=0; i<path.length; ++i ) {
-        path[i].render(color(0,0,255));
+        //path[i].render(color(0,0,255));
     }
+
+    // 패스 라인 드로잉
+
+    noFill();
+    stroke(255,0,255);
+    strokeWeight(w/2);
+    beginShape();
+    for( var i=0; i<path.length; ++i ) {
+        vertex( path[i].i*w+w/2, path[i].j*h+h/2 );
+    }
+    endShape();
 }
 
 

@@ -22,8 +22,8 @@ function description () {
     });
 
 
-    defaultCanvasWidth  = 400;
-    defaultCanvasHeight = 400;
+    defaultCanvasWidth  = 800;
+    defaultCanvasHeight = 800;
 }
 
 // -----------------------------------------------------------------
@@ -36,8 +36,8 @@ var openSet     = [];
 var closedSet    = [];
 var start;
 var end;
-var w; // 스팟 가로스케일
-var h; // 스팟 세로스케일
+var w; // 타일 가로스케일
+var h; // 타일 세로스케일
 var path = [];
 
 // -----------------------------------------------------------------
