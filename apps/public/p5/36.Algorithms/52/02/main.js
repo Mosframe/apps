@@ -13,24 +13,13 @@
 
 function description () {
 
-    title       = 'Islamic Star Patterns : 이슬람 스타 패턴';
-    subTitle    = '기본 프레임워크 설정';
+    title       = 'Mathematical Rose Patterns : 수학적 장미 패턴';
+    subTitle    = '파라메터 컨트롤';
 
     referUrls.push({
-        text:'Islamic Star Patterns',
-        link:'http://www.cgl.uwaterloo.ca/csk/projects/starpatterns/'
+        text:'Rose (mathematics) wiki',
+        link:'https://en.wikipedia.org/wiki/Rose_(mathematics)'
     });
-
-    referUrls.push({
-        text:'Islamic Star Patterns from Polygons in Contact',
-        link:'http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.90.5930&rep=rep1&type=pdf'
-    });
-
-    referUrls.push({
-        text:'Points, lines, and planes',
-        link:'http://paulbourke.net/geometry/pointlineplane/'
-    });
-
 
     defaultCanvasWidth  = 400;
     defaultCanvasHeight = 400;
@@ -39,12 +28,12 @@ function description () {
 // -----------------------------------------------------------------
 // 프로젝트 전용 변수들
 // -----------------------------------------------------------------
-var poly;
-var angle = 75;
-var delta = 10;
+var d;
+var n;
+var k;
 
-var angleSlider;
-var deltaSlider;
+var dSlider;
+var nSlider;
 
 // -----------------------------------------------------------------
 // 사전 작업 ( preload )
@@ -52,15 +41,20 @@ var deltaSlider;
 
 function awake () {
 
-    createSpan('angle:').parent( canvasContainer );
-    angleSlider = createSlider( 0, 90, 60, 0.1 ).touchMoved( ()=>{
-        angle = angleSlider.value();
+    createSpan('d:').parent( canvasContainer );
+    dSlider = createSlider( 0, 10, 5, 1 ).touchMoved( ()=>{
+        d = dSlider.value();
+    }).parent( canvasContainer );
+    createSpan('n:').parent( canvasContainer );
+    nSlider = createSlider( 0, 10, 8, 1 ).touchMoved( ()=>{
+        n = nSlider.value();
     }).parent( canvasContainer );
 
-    createSpan('delta:').parent( canvasContainer );
-    deltaSlider = createSlider( 0, 25, 0, 0.1 ).touchMoved( ()=>{
-        delta = deltaSlider.value();
-    }).parent( canvasContainer );
+    createDiv('').parent( canvasContainer );
+    createButton('d=5').mousePressed(()=>{
+        d = 5;
+        dSlider.value(d);
+    }).parent(canvasContainer);
 }
 
 // -----------------------------------------------------------------
@@ -76,16 +70,9 @@ function start () {
     //angleMode(DEGREES);
     // removeCanvas();
 
-    angle = angleSlider.value();
-    delta = deltaSlider.value();
+    d = dSlider.value();
+    n = nSlider.value();
 
-
-    poly = new Polygon();
-    poly.addVertex(100,100);
-    poly.addVertex(300,100);
-    poly.addVertex(300,300);
-    poly.addVertex(100,300);
-    poly.close();
  }
 
 // -----------------------------------------------------------------
@@ -106,7 +93,11 @@ function  keyReleased () {
 
 function update () {
 
+    k = n / d;
 
+    v.d = d;
+    v.n = n;
+    v.k = k;
 }
 
 // -----------------------------------------------------------------
@@ -120,8 +111,20 @@ function render () {
     // frameRate(5);
     background(51);
 
-    poly.hankin();
-    poly.render();
+
+    translate(width/2, height/2);
+
+    beginShape();
+    stroke(255);
+    noFill();
+    strokeWeight(1);
+    for( var a=0; a<TWO_PI*d; a+=0.02 ) {
+        var r = 200 * cos(k*a);
+        var x = r * cos(a);
+        var y = r * sin(a);
+        vertex(x,y);
+    }
+    endShape(CLOSE);
 
 }
 

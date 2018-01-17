@@ -14,7 +14,7 @@
 function description () {
 
     title       = 'Islamic Star Patterns : 이슬람 스타 패턴';
-    subTitle    = '기본 프레임워크 설정';
+    subTitle    = '배열 적용';
 
     referUrls.push({
         text:'Islamic Star Patterns',
@@ -39,7 +39,7 @@ function description () {
 // -----------------------------------------------------------------
 // 프로젝트 전용 변수들
 // -----------------------------------------------------------------
-var poly;
+var polys = [];
 var angle = 75;
 var delta = 10;
 
@@ -80,12 +80,20 @@ function start () {
     delta = deltaSlider.value();
 
 
-    poly = new Polygon();
-    poly.addVertex(100,100);
-    poly.addVertex(300,100);
-    poly.addVertex(300,300);
-    poly.addVertex(100,300);
-    poly.close();
+
+    var inc = 100;
+
+    for( var x=0; x<width; x+=inc ) {
+        for( var y=0; y<height; y+=inc ) {
+            var poly = new Polygon();
+            poly.addVertex(x,y);
+            poly.addVertex(x+inc,y);
+            poly.addVertex(x+inc,y+inc);
+            poly.addVertex(x,y+inc);
+            poly.close();
+            polys.push(poly);
+        }
+    }
  }
 
 // -----------------------------------------------------------------
@@ -106,7 +114,8 @@ function  keyReleased () {
 
 function update () {
 
-
+    v.angle = angle;
+    v.delta = delta;
 }
 
 // -----------------------------------------------------------------
@@ -120,8 +129,10 @@ function render () {
     // frameRate(5);
     background(51);
 
-    poly.hankin();
-    poly.render();
+    for( var i=0; i<polys.length; ++i ) {
+        polys[i].hankin();
+        polys[i].render();
+    }
 
 }
 

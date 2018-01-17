@@ -74,7 +74,7 @@ class Edge {
 
         // 엣지 라인
 
-        line(this.a.x, this.a.y, this.b.x, this.b.y);
+        //line(this.a.x, this.a.y, this.b.x, this.b.y);
 
         // 핸킨
 

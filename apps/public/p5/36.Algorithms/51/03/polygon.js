@@ -14,10 +14,11 @@ class Polygon {
 
     // 생성자
 
-    constructor () {
+    constructor (n) {
 
         this.vertices = [];
         this.edges = [];
+        this.sides = n;
     }
 
     // 정점 추가
@@ -59,17 +60,7 @@ class Polygon {
         // 핸킨 생성
 
         for( var i=0; i<this.edges.length; ++i ) {
-            this.edges[i].hankin();
-        }
-
-        // 핸킨 종단점 생성
-
-        for( var i=0; i<this.edges.length; ++i ) {
-            for( var j=0; j<this.edges.length; ++j ) {
-                if( i !== j ) {
-                    this.edges[i].findEnds(this.edges[j]);
-                }
-            }
+            this.edges[i].hankin(this.sides);
         }
     }
 

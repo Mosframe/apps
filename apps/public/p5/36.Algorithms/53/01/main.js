@@ -13,24 +13,13 @@
 
 function description () {
 
-    title       = 'Islamic Star Patterns : 이슬람 스타 패턴';
-    subTitle    = '기본 프레임워크 설정';
+    title       = 'Attraction and Repulsion Forces : 인력과 반발력의 세력';
+    subTitle    = '인력과 반발력에 반응하는 입자 시스템 구현';
 
     referUrls.push({
-        text:'Islamic Star Patterns',
-        link:'http://www.cgl.uwaterloo.ca/csk/projects/starpatterns/'
+        text:'',
+        link:''
     });
-
-    referUrls.push({
-        text:'Islamic Star Patterns from Polygons in Contact',
-        link:'http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.90.5930&rep=rep1&type=pdf'
-    });
-
-    referUrls.push({
-        text:'Points, lines, and planes',
-        link:'http://paulbourke.net/geometry/pointlineplane/'
-    });
-
 
     defaultCanvasWidth  = 400;
     defaultCanvasHeight = 400;
@@ -39,12 +28,8 @@ function description () {
 // -----------------------------------------------------------------
 // 프로젝트 전용 변수들
 // -----------------------------------------------------------------
-var poly;
-var angle = 75;
-var delta = 10;
-
-var angleSlider;
-var deltaSlider;
+var attractor;
+var particle;
 
 // -----------------------------------------------------------------
 // 사전 작업 ( preload )
@@ -52,15 +37,7 @@ var deltaSlider;
 
 function awake () {
 
-    createSpan('angle:').parent( canvasContainer );
-    angleSlider = createSlider( 0, 90, 60, 0.1 ).touchMoved( ()=>{
-        angle = angleSlider.value();
-    }).parent( canvasContainer );
 
-    createSpan('delta:').parent( canvasContainer );
-    deltaSlider = createSlider( 0, 25, 0, 0.1 ).touchMoved( ()=>{
-        delta = deltaSlider.value();
-    }).parent( canvasContainer );
 }
 
 // -----------------------------------------------------------------
@@ -76,16 +53,9 @@ function start () {
     //angleMode(DEGREES);
     // removeCanvas();
 
-    angle = angleSlider.value();
-    delta = deltaSlider.value();
+    attractor = createVector(200,200);
+    particle = new Particle(200,100);
 
-
-    poly = new Polygon();
-    poly.addVertex(100,100);
-    poly.addVertex(300,100);
-    poly.addVertex(300,300);
-    poly.addVertex(100,300);
-    poly.close();
  }
 
 // -----------------------------------------------------------------
@@ -118,10 +88,19 @@ function render () {
     // noLoop();
     // colorMode(HSB);
     // frameRate(5);
-    background(51);
+    // background(51);
 
-    poly.hankin();
-    poly.render();
+    // 어트랙터
+
+    stroke(255);
+    strokeWeight(4);
+    point(attractor.x,attractor.y);
+
+    // 파티클
+
+    particle.attracted( attractor );
+    particle.update();
+    particle.render();
 
 }
 

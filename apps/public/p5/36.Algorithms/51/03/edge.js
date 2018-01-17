@@ -23,7 +23,7 @@ class Edge {
 
     // 핸킨을 만든다.
 
-    hankin () {
+    hankin (sides) {
 
         // 두 정점의 중간점
 
@@ -34,6 +34,8 @@ class Edge {
 
         var v1 = p5.Vector.sub(this.a, mid);
         var v2 = p5.Vector.sub(this.b, mid);
+
+        var elen = v1.mag() + delta; // 엣지의 길이
 
         var offset1 = mid;
         var offset2 = mid;
@@ -51,21 +53,22 @@ class Edge {
         v1.rotate(radians(-angle));
         v2.rotate(radians( angle));
 
+        // 싸인법칙 적용
+
+        var interior = (sides-2) * PI / sides;
+        var alpha = interior * 0.5;
+        var beta = PI - radians(angle) - alpha;
+        var hlen = (elen * sin(alpha)) / sin(beta); //핸킨의 길이
+
+        v1.setMag(hlen);
+        v2.setMag(hlen);
+
         // 핸킨
 
         this.h1 = new Hankin(offset1,v1);
         this.h2 = new Hankin(offset2,v2);
     }
 
-    // 핸킨들의 종단점들 찾기 : 다른 엣지의 핸킨들과 만나는 지점들
-
-    findEnds (edge) {
-
-        this.h1.findEnd( edge.h1 );
-        this.h1.findEnd( edge.h2 );
-        this.h2.findEnd( edge.h1 );
-        this.h2.findEnd( edge.h2 );
-    }
 
     // 랜더링
 
@@ -74,7 +77,7 @@ class Edge {
 
         // 엣지 라인
 
-        line(this.a.x, this.a.y, this.b.x, this.b.y);
+        //line(this.a.x, this.a.y, this.b.x, this.b.y);
 
         // 핸킨
 

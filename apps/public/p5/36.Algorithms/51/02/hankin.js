@@ -64,6 +64,8 @@ class Hankin {
 
         stroke(255,0,255);
         line(this.a.x, this.a.y, this.end.x, this.end.y);
+
+        /*
         fill(255);
         ellipse(this.a.x,this.a.y,8);
 
@@ -71,6 +73,7 @@ class Hankin {
             fill(255,255,0);
             ellipse(this.end.x,this.end.y,8);
         }
+        */
     }
 
 }
