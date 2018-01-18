@@ -17,7 +17,7 @@ class Particle {
     constructor (x,y) {
         this.pos = createVector(x,y);
         this.vel = p5.Vector.random2D(); // velocity
-        this.vel.setMag(random(2,5));
+        //this.vel.setMag(random(2,5));
         this.acc = createVector(); // acceleration
     }
 
@@ -31,7 +31,7 @@ class Particle {
         var G = 50;//6.67408; // 지구의 중력가속도
         var strength = G / fSquared;
         force.setMag( strength );
-        this.acc = force;
+        this.acc.add( force );
     }
 
     // 프레임 갱신
@@ -39,13 +39,14 @@ class Particle {
     update () {
         this.vel.add(this.acc);
         this.pos.add(this.vel);
+        this.acc.mult(0);
     }
 
     // 프레임 랜더링
 
     render () {
 
-        stroke(255,25);
+        stroke(255,150);
         strokeWeight(4);
         point(this.pos.x, this.pos.y);
     }

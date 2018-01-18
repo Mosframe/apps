@@ -14,7 +14,7 @@
 function description () {
 
     title       = 'Attraction and Repulsion Forces : 인력과 반발력의 세력';
-    subTitle    = '파티클 배열';
+    subTitle    = '파티클 배열에 다중 어트랙트 적용';
 
     referUrls.push({
         text:'',
@@ -28,7 +28,7 @@ function description () {
 // -----------------------------------------------------------------
 // 프로젝트 전용 변수들
 // -----------------------------------------------------------------
-var attractor;
+var attractors = [];
 var particles = [];
 
 // -----------------------------------------------------------------
@@ -53,11 +53,20 @@ function start () {
     //angleMode(DEGREES);
     // removeCanvas();
 
-    attractor = createVector(200,200);
-    for( var i=0; i<10; ++i ) {
-        particles.push( new Particle(200,100) );
+
+    // 파티클
+
+    for( var i=0; i<100; ++i ) {
+        //particles.push( new Particle(random(width),random(height)) );
+        particles.push( new Particle(width/2,height/2) );
     }
 
+    // 어트랙터
+
+    //attractor = createVector(width/2,height/2);
+    for( var i=0; i<10; ++i ) {
+        attractors.push( createVector(random(width),random(height)) );
+    }
  }
 
 // -----------------------------------------------------------------
@@ -92,17 +101,24 @@ function render () {
     // frameRate(5);
     // background(51);
 
-    // 어트랙터
+    // 어트랙터 드로잉
 
     stroke(255);
     strokeWeight(4);
-    point(attractor.x,attractor.y);
+    for( var i=0; i<attractors.length; ++i ) {
+        //point(attractors[i].x,attractors[i].y);
+    }
 
     // 파티클
 
     for( var i=0; i<particles.length; ++i ) {
         var particle = particles[i];
-        particle.attracted( attractor );
+
+        // 파티클에 모든 어트랙터 적용
+
+        for( var j=0; j<attractors.length; ++j ) {
+            particle.attracted( attractors[j] );
+        }
         particle.update();
         particle.render();
     }

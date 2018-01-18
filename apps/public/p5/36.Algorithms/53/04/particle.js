@@ -16,8 +16,10 @@ class Particle {
 
     constructor (x,y) {
         this.pos = createVector(x,y);
+        this.prev = createVector(x,y);
+        //this.vel = createVector(); // velocity
         this.vel = p5.Vector.random2D(); // velocity
-        this.vel.setMag(random(2,5));
+        //this.vel.setMag(random(2,5));
         this.acc = createVector(); // acceleration
     }
 
@@ -27,11 +29,11 @@ class Particle {
 
         var force = p5.Vector.sub(target, this.pos); // target - this.pos
         var fSquared = force.magSq();
-        fSquared = constrain(fSquared,25,500);
+        fSquared = constrain(fSquared,5,50);
         var G = 50;//6.67408; // 지구의 중력가속도
         var strength = G / fSquared;
         force.setMag( strength );
-        this.acc = force;
+        this.acc.add( force );
     }
 
     // 프레임 갱신
@@ -39,15 +41,20 @@ class Particle {
     update () {
         this.vel.add(this.acc);
         this.pos.add(this.vel);
+        this.acc.mult(0);
     }
 
     // 프레임 랜더링
 
     render () {
 
-        stroke(255,25);
-        strokeWeight(4);
-        point(this.pos.x, this.pos.y);
+        stroke(255,15);
+        strokeWeight(1);
+        //point(this.pos.x, this.pos.y);
+        line( this.pos.x, this.pos.y, this.prev.x, this.prev.y );
+
+        this.prev.x = this.pos.x;
+        this.prev.y = this.pos.y;
     }
 
 }
