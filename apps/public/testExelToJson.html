@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<title>Excel to JSON Demo</title>
+<script src="xlsx.full.min.js"></script>
+</head>
+<body>
+
+<script>
+/* set up XMLHttpRequest */
+var url = "https://onedrive.live.com/edit.aspx?resid=DBC167033C90E184!849&app=Excel&wdnd=1&wdPreviousSession=74562f44-5c3f-48b2-84fc-c420f742a0f0&wdNewAndOpenCt=1530166720762&wdPreviousCorrelation=cc713fec-533d-41fd-a827-c57d35941bfe";
+var oReq = new XMLHttpRequest();
+oReq.open("GET", url, true);
+oReq.responseType = "arraybuffer";
+
+oReq.onload = function(e) {
+  var arraybuffer = oReq.response;
+
+  /* convert data to binary string */
+  var data = new Uint8Array(arraybuffer);
+  var arr = new Array();
+  for(var i = 0; i != data.length; ++i) arr[i] = String.fromCharCode(data[i]);
+  var bstr = arr.join("");
+
+  /* Call XLSX */
+  var workbook = XLSX.read(bstr, {type:"binary"});
+
+  /* DO SOMETHING WITH workbook HERE */
+  var first_sheet_name = workbook.SheetNames[0];
+  /* Get worksheet */
+  var worksheet = workbook.Sheets[first_sheet_name];
+  console.log(XLSX.utils.sheet_to_json(worksheet,{raw:true}));
+}
+
+oReq.send();
+</script>
+</body>
+</html>
